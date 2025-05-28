@@ -1,9 +1,17 @@
 services:
-  postgres:
-    image: 'postgres:latest'
+  db_postgres:
+    container_name: KamannPostgres
+    build:
+      context: .
+      dockerfile: postgres.dockerfile
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_DB: DB
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     ports:
-      - '5432'
+      - "5432:5432"
+    volumes:
+      - postgres_db:/var/lib/postgres/data
+
+volumes:
+  postgres_db:
