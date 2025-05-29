@@ -1,0 +1,20 @@
+spring:
+  docker:
+    compose:
+      enabled: true
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/kamann_db
+    username: user
+    password: password
+
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true

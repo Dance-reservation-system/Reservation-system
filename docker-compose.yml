@@ -1,9 +1,7 @@
 services:
   kamann_db:
     container_name: kamann_db
-    build:
-      context: .
-      dockerfile: postgres.dockerfile
+    image: postgres:16.3
     environment:
       POSTGRES_DB: kamann_db
       POSTGRES_USER: user
