@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: Reservation-system
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info
+  endpoint:
+    info:
+      access: read_only
+    health:
+      access: read_only
+    metrics:
+      access: read_only
