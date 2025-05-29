@@ -11,11 +11,11 @@ A modern reservation system **engineered with Domain-Driven Design (DDD) and Cle
 
 
 ![FE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Kamann-web?color=blue&label=Active-FE)
-![BE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Kamann-modular?color=green&label=Active-BE)
+![BE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Reservation-system?color=green&label=Active-BE)
 
-[![Build with Tests](https://github.com/Dance-reservation-system/Kamann-modular/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Dance-reservation-system/Kamann/actions/workflows/ci-cd.yml)
-![GitHub last commit](https://img.shields.io/github/last-commit/Dance-reservation-system/Kamann-modular?color=green)
-![Deploy - Railway](https://github.com/Dance-reservation-system/Kamann-modular/actions/workflows/main.yml/badge.svg)
+[![Build with Tests](https://github.com/Dance-reservation-system/Reservation-system/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Dance-reservation-system/Reservation-system/actions/workflows/ci-cd.yml)
+![GitHub last commit](https://img.shields.io/github/last-commit/Dance-reservation-system/Reservation-system?color=green)
+![Deploy - Railway](https://github.com/Dance-reservation-system/Reservation-system/actions/workflows/main.yml/badge.svg)
 
 
 ## 🌟 Features
@@ -52,10 +52,10 @@ A modern reservation system **engineered with Domain-Driven Design (DDD) and Cle
 
 ## 🚀 Installation
 
-### 1. Clone Repository and change into the project directory
+### 1. Clone Repository and Change into the project directory
   ```bash
-  git clone https://github.com/Dance-reservation-system/kamann-modular.git
-  cd kamann/backend
+  git clone https://github.com/Dance-reservation-system/Reservation-system.git
+  cd Reservation-system
   ```
 
 ### 2. Create the .env file out of .env-example
