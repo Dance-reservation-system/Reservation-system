@@ -1,11 +1,11 @@
 services:
-  db_postgres:
-    container_name: KamannPostgres
+  kamann_db:
+    container_name: kamann_db
     build:
       context: .
       dockerfile: postgres.dockerfile
     environment:
-      POSTGRES_DB: DB
+      POSTGRES_DB: kamann_db
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
