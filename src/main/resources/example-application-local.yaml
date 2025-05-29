@@ -2,6 +2,12 @@ spring:
   docker:
     compose:
       enabled: true
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/kamann_db
+    user: user
+    password: password
+    locations: classpath:db/migration
 
   datasource:
     driver-class-name: org.postgresql.Driver
