@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_db:/var/lib/postgres/data
+      - kamann_db_volume:/var/lib/postgres/data
 
 volumes:
-  postgres_db:
+  kamann_db_volume:
