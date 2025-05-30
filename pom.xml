@@ -20,7 +20,7 @@
         <lombok.version>1.18.38</lombok.version>
         <postgresql.version>42.7.3</postgresql.version>
         <flyway.version>10.13.0</flyway.version>
-        <maven.compiler.plugin>3.13.0</maven.compiler.plugin>
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
     </properties>
 
     <dependencies>
@@ -78,11 +78,21 @@
     </dependencies>
 
     <build>
-        <plugins>
+        <plugins> <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>build-info</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin}</version>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
