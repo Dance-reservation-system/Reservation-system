@@ -1,0 +1,16 @@
+#For test environment
+
+spring:
+  flyway:
+    url: ${DB_URL}
+    user: ${DB_USER}
+    password: ${DB_PASSWORD}
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework: DEBUG
