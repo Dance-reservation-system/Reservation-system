@@ -11,7 +11,6 @@ A modern reservation system **engineered with Domain-Driven Design (DDD) and Cle
 
 ## ⚙️ Tech Stack
 
-<!-- collapse these badges under a <details> if you want cleaner look -->
 <details>
 <summary>Click to expand full stack</summary>
 
