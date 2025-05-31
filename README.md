@@ -2,53 +2,73 @@
 
 A modern reservation system **engineered with Domain-Driven Design (DDD) and Clean Architecture** powered by **Java 21** and **Spring Boot 3**, featuring RBAC + ABAC, membership management, class scheduling, and many more.
 
-![Java](https://img.shields.io/badge/Java-21-007396?logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.5-6DB33F?logo=springboot)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)
-![Maven](https://img.shields.io/badge/Maven-C71A36?logo=apachemaven)
-![JWT](https://img.shields.io/badge/JWT-000000?logo=jsonwebtokens&logoColor=white)
-![Swagger](https://img.shields.io/badge/Swagger-85EA2D?logo=swagger&logoColor=black)
+[![Last Commit](https://img.shields.io/github/last-commit/Dance-reservation-system/Reservation-system?style=flat-square&color=green&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/commits)
+[![Open Issues](https://img.shields.io/github/issues/Dance-reservation-system/Reservation-system?style=flat-square&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/issues)
+[![Open PRs](https://img.shields.io/github/issues-pr/Dance-reservation-system/Reservation-system?style=flat-square&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/pulls)
+[![BE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Reservation-system?style=flat-square&color=green&label=BE%20Contributors&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/graphs/contributors)
+[![FE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Kamann-web?style=flat-square&color=blue&label=FE%20Contributors&logo=github)](https://github.com/Dance-reservation-system/Kamann-web/graphs/contributors)
 
 
-![FE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Kamann-web?color=blue&label=Active-FE)
-![BE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Reservation-system?color=green&label=Active-BE)
+## ⚙️ Tech Stack
 
-[![Build with Tests](https://github.com/Dance-reservation-system/Reservation-system/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Dance-reservation-system/Reservation-system/actions/workflows/ci-cd.yml)
-![GitHub last commit](https://img.shields.io/github/last-commit/Dance-reservation-system/Reservation-system?color=green)
-![Deploy - Railway](https://github.com/Dance-reservation-system/Reservation-system/actions/workflows/main.yml/badge.svg)
+<!-- collapse these badges under a <details> if you want cleaner look -->
+<details>
+<summary>Click to expand full stack</summary>
 
+### Core
+![Java](https://img.shields.io/badge/Java-21-007396?style=flat-square&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.0-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-3.9-C71A36?style=flat-square&logo=apachemaven&logoColor=white)
+
+### Architecture
+![DDD](https://img.shields.io/badge/DDD-Domain--Driven--Design-blueviolet?style=flat-square)
+![Clean Architecture](https://img.shields.io/badge/Architecture-Clean-lightgrey?style=flat-square)
+
+### DB + Migration
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Flyway](https://img.shields.io/badge/Flyway-10.13.0-CC0200?style=flat-square&logo=flyway&logoColor=white)
+
+### Security & Access
+![Keycloak](https://img.shields.io/badge/Keycloak-IdP_Authz_Identity-0075A8?style=flat-square&logo=keycloak&logoColor=white)
+![OAuth2](https://img.shields.io/badge/OAuth2-Enabled-orange?style=flat-square&logo=oauth)
+![OpenID](https://img.shields.io/badge/OpenID%20Connect-Supported-orange?style=flat-square&logo=openid)
+![JWT](https://img.shields.io/badge/JWT-Authorization-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)
+
+### Docs & DevOps
+![Swagger](https://img.shields.io/badge/OpenAPI-3.0-6BA539?style=flat-square&logo=swagger&logoColor=black)
+![CI/CD](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=flat-square&logo=githubactions&logoColor=white)
+![Railway](https://img.shields.io/badge/Deployed%20to-Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white)
+
+</details>
+
+---
 
 ## 🌟 Features
 
+<details>
+<summary>Click to view role-specific features</summary>
+
 ### 🛡️ Admin
-- Full event lifecycle management
-- User administration with activation/deactivation
+- Event lifecycle management
+- User management (activate/deactivate)
 - Financial reporting (weekly/monthly/yearly)
 - Attendance analytics dashboard
 
 ### 🕺 Instructor
-- Personal schedule management
-- Real-time attendance tracking
-- Membership validation system
-- Class cancellation notifications
+- Personal schedule
+- Real-time attendance
+- Membership validation
+- Class cancellation alerts
 
 ### 💃 Client
-- Calendar for booking events
-- Class booking system with membership integration
-- Membership usage tracking
-- Advanced event search filters
+- Bookable event calendar
+- Membership-integrated bookings
+- Usage tracking
+- Search filters
 
-## 🛠️ Technologies
+</details>
 
-- **Architecture**: Domain-Driven Design • Clean Architecture
-- **Core**: Java 21 • Spring Boot 3
-- **Database**: PostgreSQL 16
-- **Identity & Access**: Keycloak (central IdP — OpenID Connect, OAuth 2.0, RBAC + ABAC policies)
-- **Security**: JWT tokens issued by Keycloak
-- **API Docs**: Swagger / OpenAPI 3.0
-- **CI/CD**: GitHub Actions
-- **Deploy**: Railway (Cloud PaaS)
-
+---
 
 ## 🚀 Installation
 
