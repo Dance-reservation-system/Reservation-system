@@ -10,6 +10,12 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
 
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+
 logging:
   level:
     root: INFO

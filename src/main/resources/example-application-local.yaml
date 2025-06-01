@@ -1,14 +1,16 @@
+# Use this file as a template to create your own 'application-local.yaml'.
+# 'application-local.yaml' file should be excluded from version control (e.g., listed in .gitignore),
+# as it may contain environment-specific settings such as credentials or server URLs.
+
 spring:
   docker:
     compose:
       enabled: true
 
   flyway:
-    enabled: true
     url: jdbc:postgresql://localhost:5432/kamann_db
     user: user
     password: password
-    locations: classpath:db/migration
 
   datasource:
     driver-class-name: org.postgresql.Driver
