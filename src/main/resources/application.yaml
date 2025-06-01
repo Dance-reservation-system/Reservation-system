@@ -2,6 +2,23 @@ spring:
   application:
     name: Reservation-system
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+
 management:
   endpoints:
     web:
