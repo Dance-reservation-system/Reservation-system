@@ -1,4 +1,48 @@
+networks:
+  kamann_network:
+    driver: bridge
+
 services:
+  kamann_keycloak:
+    container_name: kamann_keycloak
+    image: quay.io/keycloak/keycloak:26.2
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL_HOST: kamann_keycloak_db
+      KC_DB_URL_DATABASE: keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: password
+      KC_DB_SCHEMA: public
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: password
+    ports:
+      - "8081:8080"
+    depends_on:
+      kamann_keycloak_db:
+        condition: service_healthy
+    networks:
+      - kamann_network
+
+  kamann_keycloak_db:
+    container_name: kamann_keycloak_db
+    image: postgres:16.3
+    environment:
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: keycloak_user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - kamann_keycloak_db_volume:/var/lib/postgresql/data
+    networks:
+      - kamann_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keycloak_user" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   kamann_db:
     container_name: kamann_db
     image: postgres:16.3
@@ -9,7 +53,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - kamann_db_volume:/var/lib/postgres/data
+      - kamann_db_volume:/var/lib/postgresql/data
 
 volumes:
   kamann_db_volume:
+  kamann_keycloak_db_volume:
