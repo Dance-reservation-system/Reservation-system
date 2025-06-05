@@ -8,9 +8,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-import static com.reservation.client.ClientTestFactory.FIXED_INSTANT;
-import static com.reservation.client.ClientTestFactory.expectedTestClient;
+import static com.reservation.client.ClientTestFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,11 +27,9 @@ class ClientServiceTest {
     @InjectMocks
     private ClientService clientService;
 
-    private final Client client = expectedTestClient();
-
     private static final ClientResponseDto clientResponse = new ClientResponseDto(
-            1L, "client-1", "client-1@example.com", FIXED_INSTANT);
-
+            ID, "client-1", "client-1@example.com", FIXED_INSTANT);
+    private final Client client = expectedTestClient();
 
     @Test
     void shouldReturnListOfAllClients() {
@@ -56,8 +54,8 @@ class ClientServiceTest {
 
     @Test
     void shouldReturnClientWhenExists() {
-        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
-        ClientResponseDto result = clientService.getClientById(1L);
+        when(clientRepository.findById(ID)).thenReturn(Optional.of(client));
+        ClientResponseDto result = clientService.getClientById(ID);
 
         assertThat(result)
                 .usingRecursiveComparison()
@@ -66,11 +64,11 @@ class ClientServiceTest {
 
     @Test
     void shouldThrowEntityNotFoundExceptionWhenClientNotFound() {
-        when(clientRepository.findById(1L)).thenReturn(Optional.empty());
+        when(clientRepository.findById(ID)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> clientService.getClientById(1L))
+        assertThatThrownBy(() -> clientService.getClientById(ID))
                 .isInstanceOf(ClientException.class)
-                .hasMessage("Client with id: 1 not found");
+                .hasMessage("Client with id: " + ID + " not found");
     }
 
     @Test
@@ -91,19 +89,18 @@ class ClientServiceTest {
 
     @Test
     void shouldUpdateExistingClientSuccessfully() {
-        Long id = 1L;
         ClientRequestDto updateDto = new ClientRequestDto("updated-client-1", "updated-client-1@example.com");
         Client updatedClient = Client.builder()
                 .name("updated-client-1")
                 .email("updated-client-1@example.com")
                 .build();
-        updatedClient.setId(id);
+        updatedClient.setId(ID);
         updatedClient.setCreatedAt(FIXED_INSTANT);
 
-        when(clientRepository.findById(id)).thenReturn(Optional.of(client));
+        when(clientRepository.findById(ID)).thenReturn(Optional.of(client));
         when(clientRepository.save(any(Client.class))).thenReturn(updatedClient);
 
-        ClientResponseDto result = clientService.updateClient(id, updateDto);
+        ClientResponseDto result = clientService.updateClient(ID, updateDto);
 
         assertThat(result.name()).isEqualTo("updated-client-1");
         assertThat(result.email()).isEqualTo("updated-client-1@example.com");
@@ -112,14 +109,13 @@ class ClientServiceTest {
 
     @Test
     void shouldThrowEntityNotFoundExceptionWhenUpdatingNonExistingClient() {
-        Long id = 1L;
-        when(clientRepository.findById(id)).thenReturn(Optional.empty());
+        when(clientRepository.findById(ID)).thenReturn(Optional.empty());
 
         ClientRequestDto clientRequest = new ClientRequestDto("name", "name@example.com");
 
-        assertThatThrownBy(() -> clientService.updateClient(id, clientRequest))
+        assertThatThrownBy(() -> clientService.updateClient(ID, clientRequest))
                 .isInstanceOf(ClientException.class)
-                .hasMessage("Client with id: 1 not found");
+                .hasMessage("Client with id: " + ID + " not found");
 
         verify(clientRepository, never()).save(any());
     }
@@ -127,22 +123,20 @@ class ClientServiceTest {
 
     @Test
     void shouldDeleteExistingClientSuccessfully() {
-        Long id = 1L;
-        when(clientRepository.existsById(id)).thenReturn(true);
+        when(clientRepository.existsById(ID)).thenReturn(true);
 
-        clientService.deleteClient(id);
+        clientService.deleteClient(ID);
 
-        verify(clientRepository).deleteById(id);
+        verify(clientRepository).deleteById(ID);
     }
 
     @Test
     void shouldThrowEntityNotFoundExceptionWhenDeletingNonExistingClient() {
-        Long id = 1L;
-        when(clientRepository.existsById(id)).thenReturn(false);
+        when(clientRepository.existsById(ID)).thenReturn(false);
 
-        assertThatThrownBy(() -> clientService.deleteClient(id))
+        assertThatThrownBy(() -> clientService.deleteClient(ID))
                 .isInstanceOf(ClientException.class)
-                .hasMessage("Client with id: 1 not found");
+                .hasMessage("Client with id: " + ID + " not found");
 
         verify(clientRepository, never()).deleteById(any());
     }

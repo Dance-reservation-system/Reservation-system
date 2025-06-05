@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.reservation.client.ClientResponseDto.mapToDto;
 
@@ -23,7 +24,7 @@ class ClientService {
     }
 
     @Transactional(readOnly = true)
-    ClientResponseDto getClientById(Long id) {
+    ClientResponseDto getClientById(UUID id) {
         return clientRepository.findById(id)
                 .map(ClientResponseDto::mapToDto)
                 .orElseThrow(() -> ClientException.clientNotFound(id));
@@ -36,7 +37,7 @@ class ClientService {
     }
 
     @Transactional
-    ClientResponseDto updateClient(Long id, ClientRequestDto clientDto) {
+    ClientResponseDto updateClient(UUID id, ClientRequestDto clientDto) {
         Client clientToUpdate = clientRepository.findById(id)
                 .orElseThrow(() -> ClientException.clientNotFound(id));
 
@@ -47,7 +48,7 @@ class ClientService {
     }
 
     @Transactional
-    void deleteClient(Long id) {
+    void deleteClient(UUID id) {
         if (!clientRepository.existsById(id)) {
             throw ClientException.clientNotFound(id);
         }

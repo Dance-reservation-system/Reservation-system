@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.UUID;
+
+import static com.reservation.client.ClientTestFactory.ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,7 +28,7 @@ class ClientControllerIT extends AbstractIT {
     @Autowired
     private ClientRepository clientRepository;
 
-    private final long expectedClientId = 1L;
+    private final UUID expectedClientId = ID;
     private Client expectedClient;
     private ClientRequestDto testClientDto;
 
@@ -114,7 +117,7 @@ class ClientControllerIT extends AbstractIT {
     @Test
     @SneakyThrows
     void shouldReturnNotFoundForNonExistentClient() {
-        mockMvc.perform(get("/api/v1/clients/{id}", 999L))
+        mockMvc.perform(get("/api/v1/clients/{id}", UUID.randomUUID()))
                 .andExpect(status().isNotFound());
     }
 }

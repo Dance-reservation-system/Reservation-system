@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @Log4j2
 @RestController
@@ -32,7 +33,7 @@ class ClientController extends BaseController {
     }
 
     @GetMapping("/{id}")
-    public ClientResponseDto getClient(@PathVariable Long id) {
+    public ClientResponseDto getClient(@PathVariable UUID id) {
         return clientService.getClientById(id);
     }
 
@@ -43,13 +44,13 @@ class ClientController extends BaseController {
     }
 
     @PutMapping("/{id}")
-    public ClientResponseDto updateClient(@PathVariable Long id, @RequestBody @Valid ClientRequestDto clientDto) {
+    public ClientResponseDto updateClient(@PathVariable UUID id, @RequestBody @Valid ClientRequestDto clientDto) {
         return clientService.updateClient(id, clientDto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteClient(@PathVariable Long id) {
+    public void deleteClient(@PathVariable UUID id) {
         clientService.deleteClient(id);
     }
 

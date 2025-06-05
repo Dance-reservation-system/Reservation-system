@@ -3,10 +3,11 @@ package com.reservation.client;
 import lombok.Builder;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Builder
 public record ClientResponseDto(
-        Long id,
+        UUID id,
         String name,
         String email,
         Instant createdAt

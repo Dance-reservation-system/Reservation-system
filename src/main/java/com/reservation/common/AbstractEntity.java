@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @MappedSuperclass
 @Getter
@@ -12,8 +13,9 @@ import java.time.Instant;
 public class AbstractEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    protected UUID id;
 
     @Column(name = "created_at", nullable = false)
     protected Instant createdAt;
