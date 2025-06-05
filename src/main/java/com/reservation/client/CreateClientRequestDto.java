@@ -3,7 +3,7 @@ package com.reservation.client;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-record ClientRequestDto(
+record CreateClientRequestDto(
         @NotBlank
         String name,
         @Email

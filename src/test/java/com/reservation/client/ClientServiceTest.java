@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.reservation.client.ClientTestFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +50,6 @@ class ClientServiceTest {
         assertThat(result).isEmpty();
     }
 
-
     @Test
     void shouldReturnClientWhenExists() {
         when(clientRepository.findById(ID)).thenReturn(Optional.of(client));
@@ -74,7 +72,7 @@ class ClientServiceTest {
     @Test
     void shouldCreateNewClientSuccessfully() {
         // given
-        ClientRequestDto inputDto = new ClientRequestDto("client-1", "client-1@example.com");
+        CreateClientRequestDto inputDto = new CreateClientRequestDto("client-1", "client-1@example.com");
         when(clientRepository.save(any(Client.class))).thenReturn(client);
 
         ClientResponseDto result = clientService.createClient(inputDto);
@@ -89,7 +87,7 @@ class ClientServiceTest {
 
     @Test
     void shouldUpdateExistingClientSuccessfully() {
-        ClientRequestDto updateDto = new ClientRequestDto("updated-client-1", "updated-client-1@example.com");
+        var updateDto = new UpdateClientRequestDto("updated-client-1", "updated-client-1@example.com");
         Client updatedClient = Client.builder()
                 .name("updated-client-1")
                 .email("updated-client-1@example.com")
@@ -109,11 +107,11 @@ class ClientServiceTest {
 
     @Test
     void shouldThrowEntityNotFoundExceptionWhenUpdatingNonExistingClient() {
+        var updateDto = new UpdateClientRequestDto("name", "name@example.com");
+
         when(clientRepository.findById(ID)).thenReturn(Optional.empty());
 
-        ClientRequestDto clientRequest = new ClientRequestDto("name", "name@example.com");
-
-        assertThatThrownBy(() -> clientService.updateClient(ID, clientRequest))
+        assertThatThrownBy(() -> clientService.updateClient(ID, updateDto))
                 .isInstanceOf(ClientException.class)
                 .hasMessage("Client with id: " + ID + " not found");
 

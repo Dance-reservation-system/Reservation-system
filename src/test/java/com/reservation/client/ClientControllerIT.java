@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static com.reservation.client.ClientTestFactory.ID;
+import static com.reservation.client.ClientTestFactory.expectedTestClient;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,17 +31,14 @@ class ClientControllerIT extends AbstractIT {
 
     private final UUID expectedClientId = ID;
     private Client expectedClient;
-    private ClientRequestDto testClientDto;
+    private CreateClientRequestDto testClientDto;
 
     @BeforeEach
     void setUp() {
 
-        expectedClient = Client.builder()
-                .name("client-1")
-                .email("client-1@example.com")
-                .build();
+        expectedClient = expectedTestClient();
 
-        testClientDto = new ClientRequestDto(
+        testClientDto = new CreateClientRequestDto(
                 "client-2",
                 "client-2@example.com"
         );
@@ -85,7 +83,7 @@ class ClientControllerIT extends AbstractIT {
     @Test
     @SneakyThrows
     void shouldUpdateClient() {
-        ClientRequestDto updateDto = new ClientRequestDto(
+        CreateClientRequestDto updateDto = new CreateClientRequestDto(
                 "client-2",
                 "client-2@example.com"
         );

@@ -31,18 +31,22 @@ class ClientService {
     }
 
     @Transactional
-    ClientResponseDto createClient(ClientRequestDto clientDto) {
+    ClientResponseDto createClient(CreateClientRequestDto clientDto) {
         Client client = new Client(clientDto.name(), clientDto.email());
         return mapToDto(clientRepository.save(client));
     }
 
     @Transactional
-    ClientResponseDto updateClient(UUID id, ClientRequestDto clientDto) {
+    ClientResponseDto updateClient(UUID id, UpdateClientRequestDto clientDto) {
         Client clientToUpdate = clientRepository.findById(id)
                 .orElseThrow(() -> ClientException.clientNotFound(id));
 
-        clientToUpdate.setName(clientDto.name());
-        clientToUpdate.setEmail(clientDto.email());
+        if(clientDto.name() != null) {
+            clientToUpdate.setName(clientDto.name());
+        }
+        if(clientDto.email() != null) {
+            clientToUpdate.setEmail(clientDto.email());
+        }
 
         return mapToDto(clientRepository.save(clientToUpdate));
     }

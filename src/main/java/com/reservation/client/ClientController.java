@@ -39,12 +39,12 @@ class ClientController extends BaseController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ClientResponseDto createClient(@RequestBody @Valid ClientRequestDto clientDto) {
+    public ClientResponseDto createClient(@RequestBody @Valid CreateClientRequestDto clientDto) {
         return clientService.createClient(clientDto);
     }
 
     @PutMapping("/{id}")
-    public ClientResponseDto updateClient(@PathVariable UUID id, @RequestBody @Valid ClientRequestDto clientDto) {
+    public ClientResponseDto updateClient(@PathVariable UUID id, @RequestBody @Valid UpdateClientRequestDto clientDto) {
         return clientService.updateClient(id, clientDto);
     }
 
