@@ -8,7 +8,6 @@ import java.util.List;
 
 import static com.reservation.client.ClientResponseDto.mapToDto;
 
-
 @Service
 @RequiredArgsConstructor
 class ClientService {
@@ -33,24 +32,18 @@ class ClientService {
     @Transactional
     ClientResponseDto createClient(ClientRequestDto clientDto) {
         Client client = new Client(clientDto.name(), clientDto.email());
-        Client savedClient = clientRepository.save(client);
-        return mapToDto(savedClient);
+        return mapToDto(clientRepository.save(client));
     }
 
     @Transactional
     ClientResponseDto updateClient(Long id, ClientRequestDto clientDto) {
-        Client client = clientRepository.findById(id)
+        Client clientToUpdate = clientRepository.findById(id)
                 .orElseThrow(() -> ClientException.clientNotFound(id));
 
-        Client updatedClient = new Client(
-                client.getId(),
-                clientDto.name(),
-                clientDto.email(),
-                client.getCreatedAt()
-        );
+        clientToUpdate.setName(clientDto.name());
+        clientToUpdate.setEmail(clientDto.email());
 
-        Client savedClient = clientRepository.save(updatedClient);
-        return mapToDto(savedClient);
+        return mapToDto(clientRepository.save(clientToUpdate));
     }
 
     @Transactional

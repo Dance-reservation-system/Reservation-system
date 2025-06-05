@@ -25,6 +25,7 @@ class ClientControllerIT extends AbstractIT {
     @Autowired
     private ClientRepository clientRepository;
 
+    private final long expectedClientId = 1L;
     private Client expectedClient;
     private ClientRequestDto testClientDto;
 
@@ -32,7 +33,6 @@ class ClientControllerIT extends AbstractIT {
     void setUp() {
 
         expectedClient = Client.builder()
-                .id(1L)
                 .name("client-1")
                 .email("client-1@example.com")
                 .build();
@@ -73,7 +73,7 @@ class ClientControllerIT extends AbstractIT {
     @Test
     @SneakyThrows
     void shouldRetrieveClientById() {
-        mockMvc.perform(get("/api/v1/clients/{id}", expectedClient.getId()))
+        mockMvc.perform(get("/api/v1/clients/{id}", expectedClientId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(expectedClient.getName()))
                 .andExpect(jsonPath("$.email").value(expectedClient.getEmail()));
@@ -86,14 +86,14 @@ class ClientControllerIT extends AbstractIT {
                 "client-2",
                 "client-2@example.com"
         );
-        mockMvc.perform(put("/api/v1/clients/{id}", expectedClient.getId())
+        mockMvc.perform(put("/api/v1/clients/{id}", expectedClientId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(updateDto.name()))
                 .andExpect(jsonPath("$.email").value(updateDto.email()));
 
-        assertThat(clientRepository.findById(expectedClient.getId()))
+        assertThat(clientRepository.findById(expectedClientId))
                 .isPresent()
                 .get()
                 .satisfies(client -> {
@@ -105,10 +105,10 @@ class ClientControllerIT extends AbstractIT {
     @Test
     @SneakyThrows
     void shouldDeleteClient() {
-        mockMvc.perform(delete("/api/v1/clients/{id}", expectedClient.getId()))
+        mockMvc.perform(delete("/api/v1/clients/{id}", expectedClientId))
                 .andExpect(status().isNoContent());
 
-        assertThat(clientRepository.findById(expectedClient.getId())).isEmpty();
+        assertThat(clientRepository.findById(expectedClientId)).isEmpty();
     }
 
     @Test

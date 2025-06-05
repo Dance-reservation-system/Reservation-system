@@ -1,7 +1,10 @@
 package com.reservation.client;
 
+import lombok.Builder;
+
 import java.time.Instant;
 
+@Builder
 public record ClientResponseDto(
         Long id,
         String name,
@@ -10,11 +13,11 @@ public record ClientResponseDto(
 ) {
 
     static ClientResponseDto mapToDto(Client client) {
-        return new ClientResponseDto(
-                client.getId(),
-                client.getName(),
-                client.getEmail(),
-                client.getCreatedAt()
-        );
+        return ClientResponseDto.builder()
+                .id(client.getId())
+                .name(client.getName())
+                .email(client.getEmail())
+                .createdAt(client.getCreatedAt())
+                .build();
     }
 }
