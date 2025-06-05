@@ -6,25 +6,14 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-@Transactional
 class ClientControllerIT extends AbstractIT {
 
     @Autowired
@@ -36,13 +25,21 @@ class ClientControllerIT extends AbstractIT {
     @Autowired
     private ClientRepository clientRepository;
 
+    private Client expectedClient;
     private ClientRequestDto testClientDto;
 
     @BeforeEach
     void setUp() {
+
+        expectedClient = Client.builder()
+                .id(1L)
+                .name("client-1")
+                .email("client-1@example.com")
+                .build();
+
         testClientDto = new ClientRequestDto(
-                "client-1",
-                "client-1@example.com"
+                "client-2",
+                "client-2@example.com"
         );
     }
 
@@ -76,30 +73,27 @@ class ClientControllerIT extends AbstractIT {
     @Test
     @SneakyThrows
     void shouldRetrieveClientById() {
-        ClientResponseDto createdClient = createTestClient();
-
-        mockMvc.perform(get("/api/v1/clients/{id}", createdClient.id()))
+        mockMvc.perform(get("/api/v1/clients/{id}", expectedClient.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(createdClient.name()))
-                .andExpect(jsonPath("$.email").value(createdClient.email()));
+                .andExpect(jsonPath("$.name").value(expectedClient.getName()))
+                .andExpect(jsonPath("$.email").value(expectedClient.getEmail()));
     }
 
     @Test
     @SneakyThrows
     void shouldUpdateClient() {
-        ClientResponseDto existingClient = createTestClient();
         ClientRequestDto updateDto = new ClientRequestDto(
                 "client-2",
                 "client-2@example.com"
         );
-        mockMvc.perform(put("/api/v1/clients/{id}", existingClient.id())
+        mockMvc.perform(put("/api/v1/clients/{id}", expectedClient.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(updateDto.name()))
                 .andExpect(jsonPath("$.email").value(updateDto.email()));
 
-        assertThat(clientRepository.findById(existingClient.id()))
+        assertThat(clientRepository.findById(expectedClient.getId()))
                 .isPresent()
                 .get()
                 .satisfies(client -> {
@@ -111,12 +105,10 @@ class ClientControllerIT extends AbstractIT {
     @Test
     @SneakyThrows
     void shouldDeleteClient() {
-        ClientResponseDto createdClient = createTestClient();
-
-        mockMvc.perform(delete("/api/v1/clients/{id}", createdClient.id()))
+        mockMvc.perform(delete("/api/v1/clients/{id}", expectedClient.getId()))
                 .andExpect(status().isNoContent());
 
-        assertThat(clientRepository.findById(createdClient.id())).isEmpty();
+        assertThat(clientRepository.findById(expectedClient.getId())).isEmpty();
     }
 
     @Test
@@ -124,16 +116,5 @@ class ClientControllerIT extends AbstractIT {
     void shouldReturnNotFoundForNonExistentClient() {
         mockMvc.perform(get("/api/v1/clients/{id}", 999L))
                 .andExpect(status().isNotFound());
-    }
-
-    private ClientResponseDto createTestClient() throws Exception {
-        String createdClient = mockMvc.perform(post("/api/v1/clients")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testClientDto)))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        return objectMapper.readValue(createdClient, ClientResponseDto.class);
     }
 }
