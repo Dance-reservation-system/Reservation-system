@@ -1,14 +1,41 @@
 #For test environment
 
 spring:
+  docker:
+    compose:
+      enabled: true
+      file: docker-compose-dev.yml
+
   flyway:
-    url: ${DB_URL}
-    user: ${DB_USER}
-    password: ${DB_PASSWORD}
+    flyway:
+      url: jdbc:postgresql://localhost:5432/kamann_db
+      user: user
+      password: password
+
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/kamann_db
+    username: user
+    password: password
+
+  security:
+    oauth2:
+      client:
+        registration.kamann:
+          client-id: kamann-app-keycloak-id
+          client-secret: gxdIlgFCd3bHnHhAZ5T03hAGTM63J7rV
+          scope:
+            - openid
+            - profile
+            - roles
+          authorization-grant-type: authorization_code
+          redirect-uri: http://localhost:8080/login/oauth2/code/webclient
+
+        provider.kamann:
+          authorization-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/auth
+          token-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/token
+          jwk-set-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/certs
+          user-info-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/userinfo
+          user-name-attribute: preferred_username
 
 logging:
   level:
