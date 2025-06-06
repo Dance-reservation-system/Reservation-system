@@ -1,12 +1,12 @@
 networks:
   kamann_network:
     driver: bridge
-
 services:
   kamann_keycloak:
     container_name: kamann_keycloak
-    image: quay.io/keycloak/keycloak:26.2
-    command: start-dev
+    build:
+      context: ./keycloak
+      dockerfile: Dockerfile
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: kamann_keycloak_db
