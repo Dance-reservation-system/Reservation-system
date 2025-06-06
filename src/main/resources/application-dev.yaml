@@ -19,30 +19,31 @@ spring:
 
   security:
     oauth2:
+      base-url: http://localhost:8081/realms/kamann-test/protocol/openid-connect
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8081/realms/kamann-test
-          jwk-set-uri: http://localhost:8081/realms/kamann-test/protocol/openid-connect/auth
+          jwk-set-uri: http://localhost:8081/realms/kamann-test/protocol/openid-connect/certs
 
-#      client:
-#        registration.kamann:
-#          client-id: kamann-app-keycloak-id
-#          client-secret: gxdIlgFCd3bHnHhAZ5T03hAGTM63J7rV
-#          scope:
-#            - openid
-#            - profile
-#            - roles
-#          authorization-grant-type: authorization_code
-#          redirect-uri: http://localhost:8080/login/oauth2/code/webclient
-#
-#        provider.kamann:
-#          authorization-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/auth
-#          token-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/token
-#          jwk-set-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/certs
-#          user-info-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/userinfo
-#          user-name-attribute: preferred_username
+      client:
+        registration.kamann:
+          client-id: kamann-test-keycloak-id
+          client-secret: xwPSGSS20cj9XfroOebLa33jVd7u5sOr
+          scope:
+            - openid
+            - profile
+            - roles
+          authorization-grant-type: authorization_code
+          redirect-uri: http://localhost:8080/login/oauth2/code/kamann
 
-logging:
-  level:
-    root: DEBUG
-    org.springframework: DEBUG
+        provider.kamann:
+          authorization-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/auth
+          token-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/token
+          jwk-set-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/certs
+          user-info-uri: http://localhost:8081/realms/kamann-app/protocol/openid-connect/userinfo
+          user-name-attribute: preferred_username
+
+#logging:
+#  level:
+#    root: DEBUG
+#    org.springframework: DEBUG
