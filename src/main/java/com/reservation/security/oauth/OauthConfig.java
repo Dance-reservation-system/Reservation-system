@@ -9,6 +9,11 @@ import org.springframework.web.client.RestClient;
 @EnableConfigurationProperties(OauthProperties.class)
 public class OauthConfig {
 
+    /**
+     * Creates and configures a RestClient for OAuth token operations using the base URL from OauthProperties.
+     *
+     * @return a RestClient instance configured with the OAuth server's base URL
+     */
     @Bean
     public RestClient oauthTokenProvider(OauthProperties oauthProperties) {
         return RestClient.builder()
@@ -16,6 +21,11 @@ public class OauthConfig {
                 .build();
     }
 
+    /**
+     * Creates a KeycloakTokenProvider bean initialized with the provided RestClient and OauthProperties.
+     *
+     * @return a configured KeycloakTokenProvider instance
+     */
     @Bean
     public KeycloakTokenProvider keycloakTokenProvider(RestClient restClient, OauthProperties oauthProperties) {
         return new KeycloakTokenProvider(restClient, oauthProperties);

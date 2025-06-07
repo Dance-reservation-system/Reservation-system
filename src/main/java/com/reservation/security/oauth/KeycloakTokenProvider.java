@@ -16,11 +16,21 @@ public class KeycloakTokenProvider {
     private final RestClient restClient;
     private final OauthProperties oauthProperties;
 
+    /**
+     * Constructs a KeycloakTokenProvider with the specified REST client and OAuth properties.
+     */
     public KeycloakTokenProvider(RestClient restClient, OauthProperties oauthProperties) {
         this.restClient = restClient;
         this.oauthProperties = oauthProperties;
     }
 
+    /**
+     * Obtains an OAuth2 access token from the Keycloak server using the client credentials grant type.
+     *
+     * @return the access token as a string
+     * @throws IllegalStateException if the client registration for "kamann" is not found
+     * @throws RuntimeException if the access token cannot be retrieved from the Keycloak response
+     */
     public String getAccessToken() {
         var registration = oauthProperties.getClient().getRegistration().get(REGISTRATION_ID);
         if (registration == null) {
