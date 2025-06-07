@@ -26,8 +26,12 @@ management:
         include: health,metrics,info
   endpoint:
     info:
-      access: read_only
+      access: READ_ONLY
     health:
-      access: read_only
+      access: READ_ONLY
     metrics:
-      access: read_only
+      access: READ_ONLY
+
+server:
+  servlet:
+    context-path: /api/v1/
