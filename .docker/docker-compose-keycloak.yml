@@ -5,7 +5,7 @@ services:
   kamann_keycloak:
     container_name: kamann_keycloak
     build:
-      context: ./keycloak
+      context: ../.docker/keycloak
       dockerfile: Dockerfile
     environment:
       KC_DB: postgres
