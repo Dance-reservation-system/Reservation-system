@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/status")
+@RequestMapping()
 public class TestController {
 
     private final KeycloakTokenProvider tokenProvider;
@@ -15,12 +15,7 @@ public class TestController {
         this.tokenProvider = tokenProvider;
     }
 
-    @GetMapping("/check")
-    public String check() {
-        return "OK";
-    }
-
-    @GetMapping("/token")
+    @GetMapping("/test")
     public String token() {
         return tokenProvider.getAccessToken();
     }
