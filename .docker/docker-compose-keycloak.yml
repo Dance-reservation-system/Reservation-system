@@ -1,6 +1,3 @@
-networks:
-  kamann_network:
-    driver: bridge
 services:
   kamann_keycloak:
     container_name: kamann_keycloak
@@ -45,3 +42,6 @@ services:
 
 volumes:
   kamann_keycloak_db_volume:
+
+networks:
+  kamann_network:

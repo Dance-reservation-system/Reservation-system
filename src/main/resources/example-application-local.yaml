@@ -2,16 +2,14 @@ spring:
   docker:
     compose:
       enabled: true
+      file: .docker/docker-compose-local.yml
 
   flyway:
-    enabled: true
     url: jdbc:postgresql://localhost:5432/kamann_db
     user: user
     password: password
-    locations: classpath:db/migration
 
   datasource:
-    driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/kamann_db
     username: user
     password: password
@@ -21,3 +19,37 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+
+  security:
+    oauth2:
+      base-url: http://localhost:8081/realms/kamann-test/protocol/openid-connect
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/kamann-test
+          jwk-set-uri: http://localhost:8081/realms/kamann-test/protocol/openid-connect/certs
+
+      client:
+        registration.kamann:
+          client-id: kamann-test-keycloak-id
+
+#          client-secret value has to be regenerated and updated after each newly configured Keycloak container build.
+#          This is caused by Keycloak's behavior — during realm/client import, the client-secret is replaced with asterisks (****),
+#          and it cannot be preserved even if set explicitly in the import JSON.
+#
+#          It is technically possible to override the client-secret after import using the Keycloak Admin REST API or custom entrypoint scripts,
+#          but this workaround is not recommended for production use, as it introduces additional maintenance complexity and security risk.
+
+          client-secret: 16YeuamfMjtPBw98Ldxw6PYw8unVp9Xp
+          scope:
+            - openid
+            - profile
+            - roles
+          authorization-grant-type: authorization_code
+          redirect-uri: http://localhost:8080/login/oauth2/code/kamann
+
+        provider.kamann:
+          authorization-uri: http://localhost:8081/realms/kamann-test/protocol/openid-connect/auth
+          token-uri: http://localhost:8081/realms/kamann-test/protocol/openid-connect/token
+          jwk-set-uri: http://localhost:8081/realms/kamann-test/protocol/openid-connect/certs
+          user-info-uri: http://localhost:8081/realms/kamann-test/protocol/openid-connect/userinfo
+          user-name-attribute: preferred_username
