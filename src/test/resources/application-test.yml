@@ -1,0 +1,27 @@
+spring:
+  docker:
+    compose:
+      enabled: true
+      file: src/test/resources/docker-compose-test.yml
+
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://localhost:5433/kamann_test_db
+    user: test_user
+    password: test_password
+    locations: classpath:db/migration
+    clean-disabled: false
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/kamann_test_db
+    username: test_user
+    password: test_password
+
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    hibernate:
+      ddl-auto: validate
