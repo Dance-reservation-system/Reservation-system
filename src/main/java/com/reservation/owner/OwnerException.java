@@ -15,7 +15,7 @@ class OwnerException extends ReservationSystemHttpException {
         return new OwnerException(HttpStatus.NOT_FOUND, OWNER_NOT_FOUND.formatted(id));
     }
 
-    static OwnerException ownerAlreadyExists(String email) {
-        return new OwnerException(HttpStatus.BAD_REQUEST, OWNER_ALREADY_EXISTS.formatted(email));
+    static OwnerException ownerAlreadyExists(String keycloakUserId) {
+        return new OwnerException(HttpStatus.BAD_REQUEST, OWNER_ALREADY_EXISTS.formatted(keycloakUserId));
     }
 }
