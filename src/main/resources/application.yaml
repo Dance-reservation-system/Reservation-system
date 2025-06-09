@@ -31,7 +31,3 @@ management:
       access: READ_ONLY
     metrics:
       access: READ_ONLY
-
-server:
-  servlet:
-    context-path: /api/v1/
