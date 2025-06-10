@@ -10,7 +10,6 @@ import java.util.Map;
 
 @Getter
 @Setter
-@Configuration
 @ConfigurationProperties(prefix = "spring.security.oauth2")
 public class OauthProperties {
 
