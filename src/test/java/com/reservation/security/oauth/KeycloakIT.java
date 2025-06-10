@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class KeycloakIT extends AbstractIT {
 
+    public static String BASE_URL;
     public static final String ADMIN_USERNAME = "admin";
     public static final String ADMIN_PASSWORD = "password";
 
@@ -39,6 +40,7 @@ class KeycloakIT extends AbstractIT {
                 .withAdminPassword(ADMIN_PASSWORD);
 
         keycloak.start();
+        BASE_URL = keycloak.getAuthServerUrl();
 
         httpClient = HttpClient.newHttpClient();
         objectMapper = new ObjectMapper();
