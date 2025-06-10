@@ -1,5 +1,8 @@
-package com.reservation.security;
+package com.reservation.security.oauth;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reservation.AbstractIT;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,21 +16,18 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-class KeycloakTest {
+class KeycloakIT extends AbstractIT {
 
-    private static final String ADMIN_USERNAME = "admin";
-    private static final String ADMIN_PASSWORD = "password";
+    public static final String ADMIN_USERNAME = "admin";
+    public static final String ADMIN_PASSWORD = "password";
 
-    private static final String MASTER_REALM = "master";
-    private static final String TARGET_REALM = "kamann-test";
-    private static final String TARGET_CLIENT_ID = "kamann-test-keycloak-id";
+    public static final String MASTER_REALM = "master";
+    public static final String TARGET_REALM = "kamann-test";
+    public static final String TARGET_CLIENT_ID = "kamann-test-keycloak-id";
 
-    private static KeycloakContainer keycloak;
+    public static KeycloakContainer keycloak;
     private static HttpClient httpClient;
     private static ObjectMapper objectMapper;
 
@@ -69,7 +69,7 @@ class KeycloakTest {
         assertNotNull(keycloak.getAuthServerUrl());
     }
 
-    private static String getAdminAccessToken() throws IOException, InterruptedException {
+    public static String getAdminAccessToken() throws IOException, InterruptedException {
         String authUrl = keycloak.getAuthServerUrl() + "/realms/" + MASTER_REALM + "/protocol/openid-connect/token";
 
         String form = "grant_type=password"
@@ -91,7 +91,7 @@ class KeycloakTest {
         return jsonNode.get("access_token").asText();
     }
 
-    private static String getClientUuidByClientId(String adminToken, String realm, String clientId) throws IOException, InterruptedException {
+    public static String getClientUuidByClientId(String adminToken, String realm, String clientId) throws IOException, InterruptedException {
         String url = keycloak.getAuthServerUrl() + "/admin/realms/" + realm + "/clients?clientId=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8);
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -131,7 +131,7 @@ class KeycloakTest {
         return jsonNode.get("value").asText();
     }
 
-    private static String getClientSecret(String adminToken, String realm, String clientUuid) throws IOException, InterruptedException {
+    public static String getClientSecret(String adminToken, String realm, String clientUuid) throws IOException, InterruptedException {
         String url = keycloak.getAuthServerUrl() + "/admin/realms/" + realm + "/clients/" + clientUuid + "/client-secret";
 
         HttpRequest request = HttpRequest.newBuilder()
