@@ -14,6 +14,7 @@ import java.util.Map;
 public class OauthProperties {
 
     private String baseUrl;
+    private String registrationName;
     private Resourceserver resourceserver;
     private Client client;
 

@@ -6,6 +6,7 @@ spring:
 
   security:
     oauth2:
+      registration-name: kamann
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9999/realms/fake-realm

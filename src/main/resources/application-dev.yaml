@@ -18,12 +18,15 @@ spring:
   security:
     oauth2:
       base-url: ${OAUTH2_BASE_URL}
+#      this name have to be equal with suffix of client.registration property name
+      registration-name: kamann
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI}
           jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
 
       client:
+#        registration suffix have to be equal with registration name - that solution allow to simplify null check condition
         registration.kamann:
           client-id: ${KEYCLOAK_CLIENT_ID}
           client-secret: ${KEYCLOAK_CLIENT_SECRET}

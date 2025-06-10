@@ -11,8 +11,6 @@ import java.util.Map;
 @Component
 public class KeycloakTokenProvider {
 
-    private static final String REGISTRATION_ID = "kamann";
-
     private final RestClient restClient;
     private final OauthProperties oauthProperties;
 
@@ -22,10 +20,7 @@ public class KeycloakTokenProvider {
     }
 
     public String getAccessToken() {
-        var registration = oauthProperties.getClient().getRegistration().get(REGISTRATION_ID);
-        if (registration == null) {
-            throw new IllegalStateException("Client registration 'kamann' not found");
-        }
+        var registration = oauthProperties.getClient().getRegistration().get(oauthProperties.getRegistrationName());
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "client_credentials");

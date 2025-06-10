@@ -23,12 +23,15 @@ spring:
   security:
     oauth2:
       base-url: http://localhost:8081/realms/kamann-test/protocol/openid-connect
+#      this name have to be equal with suffix of client.registration property name
+      registration-name: kamann
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8081/realms/kamann-test
           jwk-set-uri: http://localhost:8081/realms/kamann-test/protocol/openid-connect/certs
 
       client:
+#        registration suffix have to be equal with registration name - that solution allow to simplify null check condition
         registration.kamann:
           client-id: kamann-test-keycloak-id
 

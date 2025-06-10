@@ -10,6 +10,31 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
 
+  security:
+    oauth2:
+      base-url: ${OAUTH2_BASE_URL}
+#      this property value have to be equal with suffix of client.registration property name
+      registration-name: kamann
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
+
+      client:
+#        registration suffix have to be equal with registration name - that solution allow to simplify null check condition
+        registration.kamann:
+          client-id: ${KEYCLOAK_CLIENT_ID}
+          client-secret: ${KEYCLOAK_CLIENT_SECRET}
+          scope: ${KEYCLOAK_CLIENT_SCOPE}
+          authorization-grant-type: ${KEYCLOAK_OAUTH2_AUTHORIZATION_GRANT_TYPE}
+          redirect-uri: ${KEYCLOAK_OAUTH2_REDIRECT_URI}
+
+        provider.kamann:
+          authorization-uri: ${KEYCLOAK_OAUTH2_AUTHORIZATION_URI}
+          token-uri: ${KEYCLOAK_OAUTH2_TOKEN_URI}
+          jwk-set-uri: ${KEYCLOAK_OAUTH2_JWT_SET_URI}
+          user-info-uri: ${KEYCLOAK_OAUTH2_USER_INFO_URI}
+
 logging:
   level:
     root: INFO
