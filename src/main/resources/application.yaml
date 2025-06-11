@@ -14,10 +14,6 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate:
-        show_sql: false
-        format_sql: false
 
 management:
   endpoints:
