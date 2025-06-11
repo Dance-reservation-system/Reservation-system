@@ -11,11 +11,11 @@ import java.util.Map;
 @Component
 public class KeycloakTokenProvider {
 
-    private final RestClient restClient;
+    private final RestClient keycloakClient;
     private final OauthProperties oauthProperties;
 
     public KeycloakTokenProvider(RestClient restClient, OauthProperties oauthProperties) {
-        this.restClient = restClient;
+        this.keycloakClient = restClient;
         this.oauthProperties = oauthProperties;
     }
 
@@ -27,7 +27,7 @@ public class KeycloakTokenProvider {
         formData.add("client_id", registration.clientId());
         formData.add("client_secret", registration.clientSecret());
 
-        Map<String, Object> response = restClient.post()
+        Map<String, Object> response = keycloakClient.post()
                 .uri("/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(formData)

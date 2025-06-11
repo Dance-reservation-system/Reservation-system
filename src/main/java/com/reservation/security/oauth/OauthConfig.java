@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 public class OauthConfig {
 
     @Bean
-    public RestClient oauthTokenProvider(OauthProperties oauthProperties) {
+    public RestClient keycloakClient(OauthProperties oauthProperties) {
         return RestClient.builder()
                 .baseUrl(oauthProperties.getBaseUrl())
                 .build();
