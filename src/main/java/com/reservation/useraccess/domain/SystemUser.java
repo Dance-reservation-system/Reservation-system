@@ -1,39 +1,55 @@
 package com.reservation.useraccess.domain;
 
+import com.reservation.useraccess.domain.exception.SelfDeactivationException;
+import com.reservation.useraccess.domain.exception.UserAlreadyActiveException;
+import com.reservation.useraccess.domain.exception.UserAlreadyInactiveException;
 import lombok.Getter;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
-public class SystemUser {
-    @Getter
+@Getter
+public final class SystemUser {
+    private boolean active;
     private final UUID keycloakUserId;
-    @Getter
-    private UserRole role;
-    private UserStatus status;
+    private Set<UserRole> roles;
 
-    public SystemUser(UUID keycloakUserId, UserRole role) {
-        this.keycloakUserId = Objects.requireNonNull(keycloakUserId, "Keycloak user ID cannot be null");
-        this.role = Objects.requireNonNull(role, "Role cannot be null");
-        this.status = UserStatus.active();
+    public SystemUser(UUID keycloakUserId, Set<UserRole> roles) {
+        this.keycloakUserId = Objects.requireNonNull(keycloakUserId);
+        this.roles = Set.copyOf(Objects.requireNonNull(roles));
+        if (roles.isEmpty()) {
+            throw new IllegalArgumentException("User must have at least one role");
+        }
+        active = true;
     }
 
-    public boolean isActive() {
-        return this.status.isActive();
+    public Set<UserRole> getRoles() {
+        return Set.copyOf(roles);
     }
 
     public void activate() {
-        this.status = this.status.activate();
+        if (active) {
+            throw new UserAlreadyActiveException(keycloakUserId);
+        }
+        active = true;
     }
 
     public void deactivate(UUID loggedInUserId) {
-        if (Objects.equals(this.keycloakUserId, loggedInUserId)) {
+        if (!active) {
+            throw new UserAlreadyInactiveException(keycloakUserId);
+        }
+        if (Objects.equals(keycloakUserId, loggedInUserId)) {
             throw new SelfDeactivationException(loggedInUserId);
         }
-        this.status = this.status.deactivate();
+        active = false;
     }
 
-    public void changeRole(UserRole newRole) {
-        this.role = Objects.requireNonNull(newRole, "Role cannot be null");
+    public void changeRole(Set<UserRole> roles) {
+        Set<UserRole> copiedRoles = Set.copyOf(Objects.requireNonNull(roles, "Roles cannot be null"));
+        if (copiedRoles.isEmpty()) {
+            throw new IllegalArgumentException("User must have at least one role");
+        }
+        this.roles = copiedRoles;
     }
 }
