@@ -35,7 +35,7 @@ Examples: `feat-add-instructor-domain`, `fix-login-bug`
 When deprecating:
 ```java
 @Deprecated("Use NewFeature instead")
-public void oldMethod() { … }
+public void oldMethod() {}
 ```
 Then open a discussion in the PR (“Why deprecated?”, “When to remove?”).
 
