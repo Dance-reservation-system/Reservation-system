@@ -14,10 +14,6 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate:
-        show_sql: false
-        format_sql: false
 
 management:
   endpoints:
@@ -26,8 +22,8 @@ management:
         include: health,metrics,info
   endpoint:
     info:
-      access: read_only
+      access: READ_ONLY
     health:
-      access: read_only
+      access: READ_ONLY
     metrics:
-      access: read_only
+      access: READ_ONLY
