@@ -1,0 +1,20 @@
+services:
+  local-kamann_db:
+    container_name: local-kamann_db
+    image: postgres:16.3
+    environment:
+      POSTGRES_DB: kamann_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - local-kamann_db_volume:/var/lib/postgresql/data
+    networks:
+      - kamann_network
+
+volumes:
+  local-kamann_db_volume:
+
+networks:
+  kamann_network:

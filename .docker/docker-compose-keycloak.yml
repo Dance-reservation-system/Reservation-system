@@ -1,12 +1,9 @@
-networks:
-  kamann_network:
-    driver: bridge
-
 services:
   kamann_keycloak:
     container_name: kamann_keycloak
-    image: quay.io/keycloak/keycloak:26.2
-    command: start-dev
+    build:
+      context: ../.docker/keycloak
+      dockerfile: Dockerfile
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: kamann_keycloak_db
@@ -43,18 +40,8 @@ services:
       timeout: 5s
       retries: 5
 
-  kamann_db:
-    container_name: kamann_db
-    image: postgres:16.3
-    environment:
-      POSTGRES_DB: kamann_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - kamann_db_volume:/var/lib/postgresql/data
-
 volumes:
-  kamann_db_volume:
   kamann_keycloak_db_volume:
+
+networks:
+  kamann_network:
