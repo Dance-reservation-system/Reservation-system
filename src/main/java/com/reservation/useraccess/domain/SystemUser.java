@@ -18,7 +18,7 @@ public final class SystemUser {
     public SystemUser(UUID keycloakUserId, Set<UserRole> roles) {
         this.keycloakUserId = Objects.requireNonNull(keycloakUserId);
         this.roles = Set.copyOf(Objects.requireNonNull(roles));
-        if (roles.isEmpty()) {
+        if (this.roles.isEmpty()) {
             throw new IllegalArgumentException("User must have at least one role");
         }
         active = true;
@@ -45,7 +45,7 @@ public final class SystemUser {
         active = false;
     }
 
-    public void changeRole(Set<UserRole> roles) {
+    public void replaceRoles(Set<UserRole> roles) {
         Set<UserRole> copiedRoles = Set.copyOf(Objects.requireNonNull(roles, "Roles cannot be null"));
         if (copiedRoles.isEmpty()) {
             throw new IllegalArgumentException("User must have at least one role");

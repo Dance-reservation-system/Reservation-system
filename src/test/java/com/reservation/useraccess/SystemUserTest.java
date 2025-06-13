@@ -56,7 +56,7 @@ class SystemUserTest {
     @Test
     void shouldChangeRoleIfValid() {
         SystemUser user = new SystemUser(UUID.randomUUID(), Set.of(UserRole.CLIENT));
-        user.changeRole(Set.of(UserRole.OWNER));
+        user.replaceRoles(Set.of(UserRole.OWNER));
 
         assertThat(user.getRoles()).contains(UserRole.OWNER);
     }
@@ -80,5 +80,11 @@ class SystemUserTest {
 
         assertThatThrownBy(() -> user.deactivate(adminId))
                 .isInstanceOf(UserAlreadyInactiveException.class);
+    }
+    @Test
+    void rolesShouldBeUnmodifiable() {
+        SystemUser user = new SystemUser(UUID.randomUUID(), Set.of(UserRole.CLIENT));
+        assertThatThrownBy(() -> user.getRoles().add(UserRole.OWNER))
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 }
