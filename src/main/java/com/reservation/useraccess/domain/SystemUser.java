@@ -3,13 +3,11 @@ package com.reservation.useraccess.domain;
 import com.reservation.useraccess.domain.exception.SelfDeactivationException;
 import com.reservation.useraccess.domain.exception.UserAlreadyActiveException;
 import com.reservation.useraccess.domain.exception.UserAlreadyInactiveException;
-import lombok.Getter;
 
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-@Getter
 public final class SystemUser {
     private boolean active;
     private final UUID keycloakUserId;
@@ -26,6 +24,14 @@ public final class SystemUser {
 
     public Set<UserRole> getRoles() {
         return Set.copyOf(roles);
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public UUID getKeycloakUserId() {
+        return keycloakUserId;
     }
 
     public void activate() {
