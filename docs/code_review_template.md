@@ -21,6 +21,3 @@
 - [ ] Merge commit title clearly states the feature (e.g. `feature: Add instructor domain` / add-instructor-domain), or any else (descriptive).
 - [ ] (Optional) Prefix with the issue number `123`-feature-name, CI will handle this soon (or not, depends on Issue tracker atm.)
 
-> **Notes:**  
-> – If something on the checklist isn’t crystal clear, clarify in comments rather than leaving ambiguity.  
-> – Keep harsh feedback in PR comments, not in the code itself.
