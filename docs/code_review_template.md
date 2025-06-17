@@ -1,7 +1,7 @@
 ## 📋 Code Review Checklist
 
 ### 1. Branches & Commits
-- [ ] Branch name clearly describes its purpose (e.g. `feature/rs-10-setup-ci-pipeline-with-sonarqube` Linear helps with that :) ).
+- [ ] Branch name clearly describes its purpose (e.g. `feature/RSB-10-setup-ci-pipeline-with-sonarqube` Linear generates that :) ).
 - [ ] (Optional) Commits follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) – you don’t have to, but it makes automation easier.
 
 ### 2. Pull Request
