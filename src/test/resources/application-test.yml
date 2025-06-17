@@ -4,6 +4,14 @@ spring:
       enabled: true
       file: src/test/resources/docker-compose-test.yml
 
+  security:
+    oauth2:
+      registration-name: kamann
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9999/realms/fake-realm
+          jwk-set-uri: http://localhost:9999/realms/fake-realm/protocol/openid-connect/certs
+
   flyway:
     enabled: true
     url: jdbc:postgresql://localhost:5433/kamann_test_db
