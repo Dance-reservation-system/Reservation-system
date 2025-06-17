@@ -13,13 +13,13 @@ public final class SystemUser {
     private final UUID keycloakUserId;
     private Set<UserRole> roles;
 
-    public SystemUser(UUID keycloakUserId, Set<UserRole> roles) {
+    public SystemUser(UUID keycloakUserId, boolean active, Set<UserRole> roles) {
         this.keycloakUserId = Objects.requireNonNull(keycloakUserId);
         this.roles = Set.copyOf(Objects.requireNonNull(roles));
         if (this.roles.isEmpty()) {
             throw new IllegalArgumentException("User must have at least one role");
         }
-        active = true;
+        this.active = active;
     }
 
     public Set<UserRole> getRoles() {
