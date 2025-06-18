@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Profile("keycloak-test")
+@Profile({"keycloak-test", "local"})
 @RestController
 @RequestMapping()
 public class TestController {
