@@ -77,6 +77,9 @@ A modern reservation system **engineered with Domain-Driven Design (DDD) and Cle
   cd Reservation-system
   ```
 
+### See detailed environment setup instructions:
+See [Keycloak Setup Guide](./docs/keycloak/manual-client-secret-setup.md)
+
 ### 2. Create the .env file out of .env-example
 ```bash
   mv .env-example .env
