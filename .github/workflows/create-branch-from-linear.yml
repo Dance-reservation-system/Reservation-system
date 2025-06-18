@@ -1,9 +1,8 @@
 name: Create Branch from Linear Bot Comment
 
 permissions:
-  contents: read
+  contents: write
   issues: write
-  pull-requests: write
 
 on:
   issue_comment:
@@ -94,4 +93,8 @@ jobs:
           ISSUE_URL="${{ github.event.issue.url }}"
           REPO_URL="https://github.com/${{ github.repository }}"
           COMMENT_BODY="🚀 Branch [\`${BRANCH_NAME}\`](${REPO_URL}/tree/${BRANCH_NAME}) created from \`develop\`."
-          curl -s -X POST -H "Authorization: token ${GH_TOKEN}"             -H "Content-Type: application/json"             -d "{"body":"${COMMENT_BODY}"}"             "$ISSUE_URL/comments"
+          curl -s -X POST \
+            -H "Authorization: token ${GH_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\":\"${COMMENT_BODY}\"}" \
+            "$ISSUE_URL/comments"
