@@ -4,6 +4,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface SystemUserRepository {
-    void save(SystemUser user);
+    SystemUser save(SystemUser user);
     Optional<SystemUser> findById(UUID id);
 }

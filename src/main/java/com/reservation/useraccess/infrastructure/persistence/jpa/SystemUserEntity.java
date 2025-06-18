@@ -7,14 +7,14 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "system_users")
-class SystemUserEntity {
+@Table(name = "system_users", schema = "public")
+public class SystemUserEntity {
     @Id
     private UUID id;
 
     private boolean active;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(name = "system_user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
@@ -28,13 +28,15 @@ class SystemUserEntity {
 
     public SystemUserEntity() {}
 
-    UUID getId() {
+    public UUID getId() {
         return id;
     }
-    boolean isActive() {
+
+    public boolean isActive() {
         return active;
     }
-    Set<UserRole> getRoles() {
+
+    public Set<UserRole> getRoles() {
         return roles;
     }
 }

@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-class JpaSystemUserRepository implements SystemUserRepository {
+public class JpaSystemUserRepository implements SystemUserRepository {
     private final SpringDataSystemUserRepository springDataSystemUserRepository;
 
     public JpaSystemUserRepository(SpringDataSystemUserRepository springDataSystemUserRepository) {
@@ -16,9 +16,9 @@ class JpaSystemUserRepository implements SystemUserRepository {
     }
 
     @Override
-    public void save(SystemUser user) {
-        SystemUserEntity entity = SystemUserMapper.toEntity(user);
-        springDataSystemUserRepository.save(entity);
+    public SystemUser save(SystemUser user) {
+        SystemUserEntity entity = springDataSystemUserRepository.save(SystemUserMapper.toEntity(user));
+        return SystemUserMapper.toDomain(entity);
     }
 
     @Override
