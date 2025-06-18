@@ -1,5 +1,10 @@
 name: Create Branch from Linear Bot Comment
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 on:
   issue_comment:
     types: [created]
@@ -26,14 +31,16 @@ jobs:
             echo "COMMENT=${{ github.event.inputs.comment_body }}" >> $GITHUB_ENV
             echo "LABELS=${{ github.event.inputs.labels }}" >> $GITHUB_ENV
           else
-            echo "COMMENT=${{ github.event.comment.body }}" >> $GITHUB_ENV
+            echo "COMMENT<<EOF" >> $GITHUB_ENV
+            echo "${{ github.event.comment.body }}" | tr '\n' ' ' >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
             echo "LABELS=$(echo '${{ toJSON(github.event.issue.labels) }}' | jq -r '.[].name' | paste -sd ',' -)" >> $GITHUB_ENV
           fi
 
       - name: Extract branch name and determine prefix
         id: extract
         run: |
-          TICKET=$(echo "$COMMENT" | awk '{print tolower($1)}')
+          TICKET=$(echo "$COMMENT" | grep -oE '[A-Za-z]+-[0-9]+' | head -n1 | tr '[:upper:]' '[:lower:]')
           TITLE=$(echo "$COMMENT" | cut -d' ' -f2-)
           SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
 
@@ -63,6 +70,13 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git fetch origin develop
+
+          # Check if branch already exists
+          if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
+            echo "Branch $BRANCH_NAME already exists. Exiting."
+            exit 1
+          fi
+
           git checkout -b "$BRANCH_NAME" origin/develop
           git push origin "$BRANCH_NAME"
 
@@ -74,4 +88,4 @@ jobs:
           ISSUE_URL="${{ github.event.issue.url }}"
           REPO_URL="https://github.com/${{ github.repository }}"
           COMMENT_BODY="🚀 Branch [\`${BRANCH_NAME}\`](${REPO_URL}/tree/${BRANCH_NAME}) created from \`develop\`."
-          curl -s -X POST -H "Authorization: token ${GH_TOKEN}"             -H "Content-Type: application/json"             -d "{"body":"$COMMENT_BODY"}"             "$ISSUE_URL/comments"
+          curl -s -X POST -H "Authorization: token ${GH_TOKEN}"             -H "Content-Type: application/json"             -d "{"body":"${COMMENT_BODY}"}"             "$ISSUE_URL/comments"
