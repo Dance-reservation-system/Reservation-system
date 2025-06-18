@@ -53,7 +53,7 @@ In the current project state:
 
 The `local` environment configuration can be customized individually — according to personal development environment preferences, e.g., different ports.
 
-For convenience, the repository contains a sample configuration file proposing a complete setup that you can copy entirely into your own `application-local.yaml` file to quickly launch the application locally.
+For convenience, the repository contains a sample configuration file **`example-application-local.yaml`** proposing a complete setup that you can copy entirely into your own `application-local.yaml` file to quickly launch the application locally.
 
 ### 🔑 Setting the `client_secret` in the Application Configuration
 

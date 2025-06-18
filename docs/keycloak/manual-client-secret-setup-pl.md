@@ -53,7 +53,7 @@ W obecnym stanie projektu:
 
 Konfiguracja środowiska `local` może być dostosowana indywidualnie — zgodnie z osobistymi preferencjami środowiska developerskiego np. inne porty.
 
-Dla wygody, w repozytorium znajduje się przykładowy plik konfiguracyjny zawierający propozycję kompletnej konfiguracji, którą można w całości skopiować do własnego pliku `application-local.yaml`, aby szybko uruchomić aplikację lokalnie.
+Dla wygody, w repozytorium znajduje się przykładowy plik konfiguracyjny **`example-application-local.yaml`** zawierający propozycję kompletnej konfiguracji, którą można w całości skopiować do własnego pliku `application-local.yaml`, aby szybko uruchomić aplikację lokalnie.
 
 ### 🔑 Ustawienie `client_secret` w konfiguracji aplikacji
 
