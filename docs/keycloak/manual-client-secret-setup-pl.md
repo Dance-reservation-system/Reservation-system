@@ -23,7 +23,7 @@ Aby sprawdzić, czy inicjalizacja Keycloak przebiegła pomyślnie, możesz otwor
 
 Jeśli wszystko działa poprawnie, powinieneś zobaczyć ekran logowania do konsoli administracyjnej Keycloak.
 
-📸 *Keycloak login form:*
+📸 *Keycloak login form:*<br>
 ![Keycloak console](./images/keycloak-console-login-form.png)
 
 Po uruchomieniu kontenera:

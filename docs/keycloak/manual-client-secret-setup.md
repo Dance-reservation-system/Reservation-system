@@ -23,7 +23,7 @@ To verify that Keycloak initialized successfully, open your browser and navigate
 
 If everything works correctly, you should see the Keycloak admin console login screen.
 
-📸 *Keycloak login form:*
+📸 *Keycloak login form:*<br>
 ![Keycloak console](./images/keycloak-console-login-form.png)
 
 After starting the container:
