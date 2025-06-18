@@ -22,6 +22,7 @@ on:
 
 jobs:
   create_branch:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.comment.user.login == 'linear' }}
     runs-on: ubuntu-latest
     steps:
       - name: Set inputs for manual run or real comment
@@ -56,7 +57,11 @@ jobs:
             PREFIX="feature"
           fi
 
-          BRANCH_NAME="${PREFIX}/${TICKET}-${SLUG}"
+          if [ -z "$SLUG" ]; then
+            BRANCH_NAME="${PREFIX}/${TICKET}"
+          else
+            BRANCH_NAME="${PREFIX}/${TICKET}-${SLUG}"
+          fi
 
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
           echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
