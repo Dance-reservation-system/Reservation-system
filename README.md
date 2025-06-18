@@ -72,15 +72,15 @@ A modern reservation system **engineered with Domain-Driven Design (DDD) and Cle
 ## 🚀 Installation
 
 ### 1. Clone Repository and Change into the project directory
-  ```bash
-  git clone https://github.com/Dance-reservation-system/Reservation-system.git
-  cd Reservation-system
-  ```
+git clone https://github.com/Dance-reservation-system/Reservation-system.git
+cd Reservation-system
+
+### See detailed environment setup instructions:
+See [Keycloak Setup Guide](./docs/keycloak/manual-client-secret-setup.md)
 
 ### 2. Create the .env file out of .env-example
-```bash
-  mv .env-example .env
-```
+mv .env-example .env
+
 
 ### 3. Containers Setup (App + PostgreSQL 16)
 The containers contains:
