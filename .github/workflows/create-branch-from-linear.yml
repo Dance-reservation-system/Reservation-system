@@ -26,14 +26,15 @@ jobs:
     steps:
       - name: Set inputs for manual run or real comment
         id: set_vars
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
           if [ -n "${{ github.event.inputs.comment_body }}" ]; then
             echo "COMMENT=${{ github.event.inputs.comment_body }}" >> $GITHUB_ENV
             echo "LABELS=${{ github.event.inputs.labels }}" >> $GITHUB_ENV
           else
-            echo "COMMENT<<EOF" >> $GITHUB_ENV
-            echo "${{ github.event.comment.body }}" | tr '\n' ' ' >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
+            SANITIZED_COMMENT=$(echo "$COMMENT_BODY" | tr '\n' ' ')
+            echo "COMMENT=$SANITIZED_COMMENT" >> $GITHUB_ENV
             echo "LABELS=$(echo '${{ toJSON(github.event.issue.labels) }}' | jq -r '.[].name' | paste -sd ',' -)" >> $GITHUB_ENV
           fi
 
