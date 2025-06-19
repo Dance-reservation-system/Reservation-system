@@ -3,13 +3,11 @@ package com.reservation.attendance.domain;
 import com.reservation.attendance.domain.exception.AttendanceAlreadyCancelledException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
-@Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Attendance {
     @EqualsAndHashCode.Include
