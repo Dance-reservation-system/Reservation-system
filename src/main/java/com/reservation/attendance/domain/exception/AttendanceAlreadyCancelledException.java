@@ -1,7 +1,7 @@
 package com.reservation.attendance.domain.exception;
 
 public class AttendanceAlreadyCancelledException extends RuntimeException {
-    public AttendanceAlreadyCancelledException(String message) {
-        super(message);
+    public AttendanceAlreadyCancelledException() {
+        super("Attendance has been cancelled");
     }
 }
