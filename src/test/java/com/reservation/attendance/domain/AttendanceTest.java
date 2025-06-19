@@ -2,6 +2,7 @@ package com.reservation.attendance.domain;
 
 
 import com.reservation.attendance.domain.exception.AttendanceAlreadyCancelledException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -12,10 +13,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AttendanceTest {
 
-    AttendanceId attendanceId = new AttendanceId(UUID.randomUUID());
-    ClientId clientId = new ClientId(UUID.randomUUID());
-    SessionOccurrenceId sessionId = new SessionOccurrenceId(UUID.randomUUID());
-    LocalDateTime confirmedAt = LocalDateTime.now();
+    AttendanceId attendanceId;
+    ClientId clientId;
+    SessionOccurrenceId sessionId;
+    LocalDateTime confirmedAt;
+
+    @BeforeEach
+    void setUp() {
+        attendanceId = new AttendanceId(UUID.randomUUID());
+        clientId = new ClientId(UUID.randomUUID());
+        sessionId = new SessionOccurrenceId(UUID.randomUUID());
+        confirmedAt = LocalDateTime.now();
+    }
 
     @Test
     void markingClientAsPresentShouldSucceed(){
