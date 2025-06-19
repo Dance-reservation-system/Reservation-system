@@ -1,6 +1,7 @@
 package com.reservation.attendance.domain;
 
 import com.reservation.attendance.domain.exception.AttendanceAlreadyCancelledException;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +10,9 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Attendance {
+    @EqualsAndHashCode.Include
     private final AttendanceId id;
     private final ClientId clientId;
     private final SessionOccurrenceId sessionOccurrenceId;
@@ -32,6 +35,7 @@ public class Attendance {
         if(confirmedAt == null){
             throw new IllegalArgumentException("confirmedAt cannot be null when marking attendance");
         }
+
         return new Attendance(id,clientId,sessionOccurrenceId,confirmedAt,AttendanceStatus.PRESENT);
     }
 

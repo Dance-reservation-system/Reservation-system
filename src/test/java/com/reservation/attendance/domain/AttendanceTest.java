@@ -1,0 +1,88 @@
+package com.reservation.attendance.domain;
+
+
+import com.reservation.attendance.domain.exception.AttendanceAlreadyCancelledException;
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+
+class AttendanceTest {
+
+    AttendanceId attendanceId = new AttendanceId(UUID.randomUUID());
+    ClientId clientId = new ClientId(UUID.randomUUID());
+    SessionOccurrenceId sessionId = new SessionOccurrenceId(UUID.randomUUID());
+    LocalDateTime confirmedAt = LocalDateTime.now();
+
+    @Test
+    void markingClientAsPresentShouldSucceed(){
+        //Given & When
+        Attendance attendance = Attendance.markPresent(attendanceId, clientId, sessionId, confirmedAt);
+
+        // Then
+        assertEquals(AttendanceStatus.PRESENT, attendance.getStatus());
+        assertTrue(attendance.isPresent());
+        assertEquals(confirmedAt, attendance.getConfirmedAt());
+    }
+
+    @Test
+    void markPresentShouldThrowExceptionWhenConfirmedAtIsNull(){
+        //Given & When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> Attendance.markPresent(attendanceId, clientId, sessionId, null));
+
+    }
+
+    @Test
+    void cancelAttendanceShouldSucceed(){
+        //Given
+        Attendance attendance = Attendance.markPresent(attendanceId, clientId, sessionId, confirmedAt);
+
+        // When
+        attendance.cancel();
+
+        //Then
+        assertEquals(AttendanceStatus.CANCELLED, attendance.getStatus());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCancellingAlreadyCancelledAttendance(){
+        //Given
+        Attendance attendance = Attendance.markPresent(attendanceId, clientId, sessionId, confirmedAt);
+
+        // When
+        attendance.cancel();
+
+        //Then
+        assertThrows(AttendanceAlreadyCancelledException.class, attendance::cancel);
+    }
+
+    @Test
+    void shouldConfirmPresenceFlag(){
+        //Given
+        Attendance attendance = Attendance.markPresent(attendanceId, clientId, sessionId, confirmedAt);
+
+        //When
+        boolean present = attendance.isPresent();
+
+        //Then
+        assertTrue(present);
+    }
+
+    @Test
+    void shouldConfirmTimeStamp(){
+        //Given
+        LocalDateTime now = LocalDateTime.now();
+        Attendance attendance = Attendance.markPresent(attendanceId, clientId, sessionId, confirmedAt);
+
+        //When
+        LocalDateTime confirmedAt = attendance.getConfirmedAt();
+
+        //Then
+        assertTrue(ChronoUnit.SECONDS.between(now, confirmedAt) < 1);
+    }
+}
