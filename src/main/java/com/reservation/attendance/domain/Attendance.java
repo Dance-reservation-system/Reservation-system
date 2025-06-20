@@ -1,6 +1,7 @@
 package com.reservation.attendance.domain;
 
 import com.reservation.attendance.domain.exception.AttendanceAlreadyCancelledException;
+import com.reservation.attendance.domain.exception.DuplicateAttendanceException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -14,37 +15,34 @@ public class Attendance {
     private final AttendanceId id;
     private final ClientId clientId;
     private final SessionOccurrenceId sessionOccurrenceId;
-    private final LocalDateTime confirmedAt;
+    private  LocalDateTime confirmedAt;
     private AttendanceStatus status;
 
     Attendance(AttendanceId id, ClientId clientId,
-                      SessionOccurrenceId sessionOccurrenceId,
-                      LocalDateTime confirmedAt, AttendanceStatus status) {
+                        SessionOccurrenceId sessionOccurrenceId,
+                        AttendanceStatus status) {
         this.id = Objects.requireNonNull(id);
         this.clientId = Objects.requireNonNull(clientId);
         this.sessionOccurrenceId = Objects.requireNonNull(sessionOccurrenceId);
-        this.confirmedAt = confirmedAt;
         this.status = status;
     }
 
-    public static Attendance markPresent(AttendanceId id, ClientId clientId,
-                                         SessionOccurrenceId sessionOccurrenceId,
-                                         LocalDateTime confirmedAt){
-        if(confirmedAt == null){
-            throw new IllegalArgumentException("confirmedAt cannot be null when marking attendance");
+    public void markPresent(){
+        if(status == AttendanceStatus.PRESENT){
+            throw new DuplicateAttendanceException();
         }
-
-        return new Attendance(id,clientId,sessionOccurrenceId,confirmedAt,AttendanceStatus.PRESENT);
+        this.confirmedAt = LocalDateTime.now();
+        this.status = AttendanceStatus.PRESENT;
     }
 
-    void cancel(){
+    public void cancel(){
         if(status == AttendanceStatus.CANCELLED){
             throw new AttendanceAlreadyCancelledException();
         }
         this.status = AttendanceStatus.CANCELLED;
     }
 
-    boolean isPresent(){
+    public boolean isPresent(){
         return status == AttendanceStatus.PRESENT;
     }
 }

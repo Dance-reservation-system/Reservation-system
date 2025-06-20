@@ -2,6 +2,7 @@ package com.reservation.attendance.domain;
 
 
 import com.reservation.attendance.domain.exception.AttendanceAlreadyCancelledException;
+import com.reservation.attendance.domain.exception.DuplicateAttendanceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,39 +17,42 @@ class AttendanceTest {
     AttendanceId attendanceId;
     ClientId clientId;
     SessionOccurrenceId sessionId;
-    LocalDateTime confirmedAt;
+    Attendance attendance;
 
     @BeforeEach
     void setUp() {
         attendanceId = new AttendanceId(UUID.randomUUID());
         clientId = new ClientId(UUID.randomUUID());
         sessionId = new SessionOccurrenceId(UUID.randomUUID());
-        confirmedAt = LocalDateTime.now();
+        attendance = new Attendance(attendanceId, clientId, sessionId, null);
     }
 
     @Test
     void markingClientAsPresentShouldSucceed(){
         //Given & When
-        Attendance attendance = Attendance.markPresent(attendanceId, clientId, sessionId, confirmedAt);
+        attendance.markPresent();
 
         // Then
         assertEquals(AttendanceStatus.PRESENT, attendance.getStatus());
         assertTrue(attendance.isPresent());
-        assertEquals(confirmedAt, attendance.getConfirmedAt());
+        assertNotNull(attendance.getConfirmedAt());
     }
 
     @Test
-    void markPresentShouldThrowExceptionWhenConfirmedAtIsNull(){
-        //Given & When & Then
-        assertThrows(IllegalArgumentException.class,
-                () -> Attendance.markPresent(attendanceId, clientId, sessionId, null));
+    void markPresentShouldThrowExceptionWhenIsAlreadyPresent(){
+        //Given
+        attendance.markPresent();
+
+        //When & Then
+        assertThrows(DuplicateAttendanceException.class,
+                () -> attendance.markPresent());
 
     }
 
     @Test
     void cancelAttendanceShouldSucceed(){
         //Given
-        Attendance attendance = Attendance.markPresent(attendanceId, clientId, sessionId, confirmedAt);
+        attendance.markPresent();
 
         // When
         attendance.cancel();
@@ -60,7 +64,7 @@ class AttendanceTest {
     @Test
     void shouldThrowExceptionWhenCancellingAlreadyCancelledAttendance(){
         //Given
-        Attendance attendance = Attendance.markPresent(attendanceId, clientId, sessionId, confirmedAt);
+        attendance.markPresent();
 
         // When
         attendance.cancel();
@@ -72,7 +76,7 @@ class AttendanceTest {
     @Test
     void shouldConfirmPresenceFlag(){
         //Given
-        Attendance attendance = Attendance.markPresent(attendanceId, clientId, sessionId, confirmedAt);
+       attendance.markPresent();
 
         //When
         boolean present = attendance.isPresent();
@@ -84,7 +88,7 @@ class AttendanceTest {
     @Test
     void confirmedAtShouldNotBeNullWhenMarkedPresent() {
         // Given
-        Attendance attendance = Attendance.markPresent(attendanceId, clientId, sessionId, confirmedAt);
+        attendance.markPresent();
 
         // When
         LocalDateTime confirmedAtFromAttendance = attendance.getConfirmedAt();
