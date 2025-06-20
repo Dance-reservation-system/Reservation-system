@@ -24,7 +24,7 @@
         <testcontainers.version>1.21.1</testcontainers.version>
         <testcontainers.keycloak.version>3.7.0</testcontainers.keycloak.version>
         <validation.api.version>3.1.1</validation.api.version>
-        <sonar.organization>reservation-system</sonar.organization>
+        <sonar.organization>dance-reservation-system</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
