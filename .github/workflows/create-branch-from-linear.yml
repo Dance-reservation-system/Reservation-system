@@ -42,6 +42,11 @@ jobs:
         id: extract
         run: |
           TICKET=$(echo "$COMMENT" | grep -oE '[A-Za-z]+-[0-9]+' | head -n1 | tr '[:upper:]' '[:lower:]')
+          
+          if [ -z "$TICKET" ]; then
+            echo "No valid ticket ID found in comment"
+            exit 1
+          fi
           TITLE=$(echo "$COMMENT" | cut -d' ' -f2-)
           SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
 
