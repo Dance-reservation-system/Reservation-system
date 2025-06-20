@@ -4,6 +4,7 @@ import com.reservation.useraccess.domain.SystemUser;
 import com.reservation.useraccess.domain.SystemUserRepository;
 import com.reservation.useraccess.domain.UserRole;
 import com.reservation.useraccess.domain.exception.UserAlreadyExistsException;
+import com.reservation.useraccess.domain.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class UserAccessService {
 
     void activateUser(UUID userId) {
         SystemUser user = systemUserRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         user.activate();
         systemUserRepository.save(user);
         log.info("User {} activated", userId);
@@ -37,7 +38,7 @@ public class UserAccessService {
 
     void deactivateUser(UUID userId, UUID loggedInUserId) {
         SystemUser user = systemUserRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         user.deactivate(loggedInUserId);
         systemUserRepository.save(user);
         log.info("User {} deactivated by {}", userId, loggedInUserId);
@@ -45,8 +46,9 @@ public class UserAccessService {
 
     void replaceUserRoles(UUID userId, Set<UserRole> roles) {
         SystemUser user = systemUserRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         user.replaceRoles(roles);
         systemUserRepository.save(user);
+        log.info("Roles for user {} replaced with {}", userId, roles);
     }
 }

@@ -3,23 +3,24 @@ package com.reservation.useraccess.domain;
 import com.reservation.useraccess.domain.exception.SelfDeactivationException;
 import com.reservation.useraccess.domain.exception.UserAlreadyActiveException;
 import com.reservation.useraccess.domain.exception.UserAlreadyInactiveException;
+import com.reservation.useraccess.domain.exception.UserRolesEmptyException;
 
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 public final class SystemUser {
-    private boolean isActive;
+    private boolean active;
     private final UUID keycloakUserId;
     private Set<UserRole> roles;
 
-    public SystemUser(UUID keycloakUserId, boolean isActive, Set<UserRole> roles) {
+    public SystemUser(UUID keycloakUserId, boolean active, Set<UserRole> roles) {
         this.keycloakUserId = Objects.requireNonNull(keycloakUserId);
         this.roles = Set.copyOf(Objects.requireNonNull(roles));
         if (this.roles.isEmpty()) {
-            throw new IllegalArgumentException("User must have at least one role");
+            throw new UserRolesEmptyException();
         }
-        this.isActive = isActive;
+        this.active = active;
     }
 
     public Set<UserRole> getRoles() {
@@ -27,7 +28,7 @@ public final class SystemUser {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public UUID getKeycloakUserId() {
@@ -35,26 +36,26 @@ public final class SystemUser {
     }
 
     public void activate() {
-        if (isActive) {
+        if (active) {
             throw new UserAlreadyActiveException(keycloakUserId);
         }
-        isActive = true;
+        active = true;
     }
 
     public void deactivate(UUID loggedInUserId) {
-        if (!isActive) {
+        if (!active) {
             throw new UserAlreadyInactiveException(keycloakUserId);
         }
         if (Objects.equals(keycloakUserId, loggedInUserId)) {
             throw new SelfDeactivationException(loggedInUserId);
         }
-        isActive = false;
+        active = false;
     }
 
     public void replaceRoles(Set<UserRole> roles) {
         Set<UserRole> copiedRoles = Set.copyOf(Objects.requireNonNull(roles, "Roles cannot be null"));
         if (copiedRoles.isEmpty()) {
-            throw new IllegalArgumentException("User must have at least one role");
+            throw new UserRolesEmptyException();
         }
         this.roles = copiedRoles;
     }
