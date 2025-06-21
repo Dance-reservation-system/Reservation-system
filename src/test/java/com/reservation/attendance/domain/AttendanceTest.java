@@ -46,7 +46,6 @@ class AttendanceTest {
         //When & Then
         assertThrows(DuplicateAttendanceException.class,
                 () -> attendance.markPresent());
-
     }
 
     @Test

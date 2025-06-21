@@ -15,34 +15,34 @@ public class Attendance {
     private final AttendanceId id;
     private final ClientId clientId;
     private final SessionOccurrenceId sessionOccurrenceId;
-    private  LocalDateTime confirmedAt;
+    private LocalDateTime confirmedAt;
     private AttendanceStatus status;
 
     Attendance(AttendanceId id, ClientId clientId,
-                        SessionOccurrenceId sessionOccurrenceId,
-                        AttendanceStatus status) {
+               SessionOccurrenceId sessionOccurrenceId,
+               AttendanceStatus status) {
         this.id = Objects.requireNonNull(id);
         this.clientId = Objects.requireNonNull(clientId);
         this.sessionOccurrenceId = Objects.requireNonNull(sessionOccurrenceId);
         this.status = status;
     }
 
-    public void markPresent(){
-        if(status == AttendanceStatus.PRESENT){
+    public void markPresent() {
+        if (status == AttendanceStatus.PRESENT) {
             throw new DuplicateAttendanceException();
         }
         this.confirmedAt = LocalDateTime.now();
         this.status = AttendanceStatus.PRESENT;
     }
 
-    public void cancel(){
-        if(status == AttendanceStatus.CANCELLED){
+    public void cancel() {
+        if (status == AttendanceStatus.CANCELLED) {
             throw new AttendanceAlreadyCancelledException();
         }
         this.status = AttendanceStatus.CANCELLED;
     }
 
-    public boolean isPresent(){
+    public boolean isPresent() {
         return status == AttendanceStatus.PRESENT;
     }
 }
