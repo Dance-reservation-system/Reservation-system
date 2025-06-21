@@ -7,4 +7,8 @@ record ClientId(UUID value) {
     public ClientId {
         Objects.requireNonNull(value);
     }
+
+    public static ClientId next() {
+        return new ClientId(UUID.randomUUID());
+    }
 }

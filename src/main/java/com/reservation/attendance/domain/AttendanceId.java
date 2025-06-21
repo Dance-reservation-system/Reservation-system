@@ -7,4 +7,8 @@ record AttendanceId(UUID value) {
     public AttendanceId {
         Objects.requireNonNull(value);
     }
+
+    public static AttendanceId next() {
+        return new AttendanceId(UUID.randomUUID());
+    }
 }

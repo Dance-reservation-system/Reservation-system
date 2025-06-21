@@ -7,4 +7,8 @@ record SessionOccurrenceId(UUID value) {
     public SessionOccurrenceId {
         Objects.requireNonNull(value);
     }
+
+    public static SessionOccurrenceId next() {
+        return new SessionOccurrenceId(UUID.randomUUID());
+    }
 }
