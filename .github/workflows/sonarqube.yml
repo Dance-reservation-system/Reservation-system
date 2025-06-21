@@ -1,18 +1,13 @@
-name: SonarQube
-permissions:
-  contents: read
+name: CI Pipeline
+
 on:
-  push:
+  pull_request:
     branches:
       - develop
-  pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
   build:
-    name: Build and analyze
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,21 +19,49 @@ jobs:
           java-version: 21
           distribution: 'zulu'
 
-      - name: Cache SonarQube packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Cache Maven packages
+      - name: Cache Maven
         uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build and analyze
+      - name: Build and test
+        run: mvn clean verify -B
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports
+
+  sonar:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'zulu'
+
+      - name: Cache Sonar
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Run SonarQube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Dance-reservation-system_Kamann-modular -Dsonar.organization=dance-reservation-system -Dsonar.host.url=https://sonarcloud.io
+        run: | 
+          mvn sonar:sonar \
+          -Dsonar.projectKey=Dance-reservation-system_Kamann-modular \
+          -Dsonar.organization=dance-reservation-system \
+          -Dsonar.host.url=https://sonarcloud.io
