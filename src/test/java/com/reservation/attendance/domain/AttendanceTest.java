@@ -24,7 +24,7 @@ class AttendanceTest {
         attendanceId = new AttendanceId(UUID.randomUUID());
         clientId = new ClientId(UUID.randomUUID());
         sessionId = new SessionOccurrenceId(UUID.randomUUID());
-        attendance = new Attendance(attendanceId, clientId, sessionId, null);
+        attendance = new Attendance(attendanceId, clientId, sessionId);
     }
 
     @Test

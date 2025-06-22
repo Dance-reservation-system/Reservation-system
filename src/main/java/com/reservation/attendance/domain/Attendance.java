@@ -19,27 +19,30 @@ public class Attendance {
     private AttendanceStatus status;
 
     Attendance(AttendanceId id, ClientId clientId,
-               SessionOccurrenceId sessionOccurrenceId,
-               AttendanceStatus status) {
+               SessionOccurrenceId sessionOccurrenceId) {
         this.id = Objects.requireNonNull(id);
         this.clientId = Objects.requireNonNull(clientId);
         this.sessionOccurrenceId = Objects.requireNonNull(sessionOccurrenceId);
-        this.status = status;
+        this.status = AttendanceStatus.CREATED;
     }
 
     public void markPresent() {
         if (status == AttendanceStatus.PRESENT) {
             throw new DuplicateAttendanceException();
         }
-        this.confirmedAt = LocalDateTime.now();
-        this.status = AttendanceStatus.PRESENT;
+        if (status == AttendanceStatus.CREATED) {
+            this.confirmedAt = LocalDateTime.now();
+            this.status = AttendanceStatus.PRESENT;
+        }
     }
 
     public void cancel() {
         if (status == AttendanceStatus.CANCELLED) {
             throw new AttendanceAlreadyCancelledException();
         }
-        this.status = AttendanceStatus.CANCELLED;
+        if (status != AttendanceStatus.CREATED) {
+            this.status = AttendanceStatus.CANCELLED;
+        }
     }
 
     public boolean isPresent() {
