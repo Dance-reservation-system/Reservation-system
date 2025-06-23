@@ -3,6 +3,7 @@ package com.reservation.attendance.domain;
 
 import com.reservation.attendance.domain.exception.AttendanceAlreadyCancelledException;
 import com.reservation.attendance.domain.exception.AttendanceCannotBeCancelledException;
+import com.reservation.attendance.domain.exception.AttendanceCannotBeMarkedPresentException;
 import com.reservation.attendance.domain.exception.DuplicateAttendanceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,5 +91,14 @@ class AttendanceTest {
 
         // Then
         assertNotNull(attendance.getConfirmedAt());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenMarkingCancelledAttendanceAsPresent() {
+        // Given
+        attendance.cancel();
+
+        // When & Then
+        assertThrows(AttendanceCannotBeMarkedPresentException.class, attendance::markPresent);
     }
 }

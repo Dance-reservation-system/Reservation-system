@@ -2,6 +2,7 @@ package com.reservation.attendance.domain;
 
 import com.reservation.attendance.domain.exception.AttendanceAlreadyCancelledException;
 import com.reservation.attendance.domain.exception.AttendanceCannotBeCancelledException;
+import com.reservation.attendance.domain.exception.AttendanceCannotBeMarkedPresentException;
 import com.reservation.attendance.domain.exception.DuplicateAttendanceException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,10 +32,11 @@ public class Attendance {
         if (status == AttendanceStatus.PRESENT) {
             throw new DuplicateAttendanceException();
         }
-        if (status == AttendanceStatus.CREATED) {
-            this.confirmedAt = LocalDateTime.now();
-            this.status = AttendanceStatus.PRESENT;
+        if (status != AttendanceStatus.CREATED) {
+            throw new AttendanceCannotBeMarkedPresentException(status.name());
         }
+        this.confirmedAt = LocalDateTime.now();
+        this.status = AttendanceStatus.PRESENT;
     }
 
     public void cancel() {
