@@ -1,4 +1,4 @@
-📘 This guide is also available in the [🇵🇱 Polish version](manual-client-secret-setup-pl.md)
+### 📘 This guide is also available in the [🇵🇱 Polish version](manual-client-secret-setup-pl.md)
 
 # Manual Configuration of `client_secret` in Keycloak (since version 25)
 

@@ -47,23 +47,34 @@ A modern reservation system **engineered with Domain-Driven Design (DDD) and Cle
 <details>
 <summary>Click to view role-specific features</summary>
 
-### 🛡️ Admin
-- Event lifecycle management
-- User management (activate/deactivate)
-- Financial reporting (weekly/monthly/yearly)
-- Attendance analytics dashboard
+### 🛡️ Owner
+- Manage user accounts (create, update, deactivate, assign roles)
+- Configure studio settings (business hours, cancellation policy, contact info)
+- Manage rooms (create, deactivate, assign to sessions)
+- Define membership card types (entry limits, expiration rules)
+- View schedule of all sessions and generate attendance reports
+- Override or delete sessions (even if booked)
+
+### 🧾 Receptionist
+- View today’s session list with instructor, room, and number of bookings
+- Assign or change rooms for upcoming sessions (if available)
+- Cancel sessions according to policy
+- Verify client membership card validity at check-in
+- Search for clients and manage their reservations on request
+- Mark a session as “in progress” when it starts
 
 ### 🕺 Instructor
-- Personal schedule
-- Real-time attendance
-- Membership validation
-- Class cancellation alerts
+- Create class sessions with title, type, date, time, duration, and hall assigned
+- Edit upcoming sessions (start time, capacity, room)
+- Cancel own sessions if no clients are registered
+- View personal teaching schedule
 
 ### 💃 Client
-- Bookable event calendar
-- Membership-integrated bookings
-- Usage tracking
-- Search filters
+- Browse upcoming sessions with filters (instructor, type, date)
+- Reserve a session if a valid membership card is held
+- Cancel reservations before the allowed deadline
+- Receive booking confirmations and expiration alerts
+- View full history of past and upcoming reservations
 
 </details>
 
@@ -79,6 +90,9 @@ A modern reservation system **engineered with Domain-Driven Design (DDD) and Cle
 
 ### See detailed environment setup instructions:
 See [Keycloak Setup Guide](./docs/keycloak/manual-client-secret-setup.md)
+
+### See contribution guidelines:
+See [Contribution Guide](./docs/contribution-en.md)
 
 ### 2. Create the .env file out of .env-example
 ```bash
