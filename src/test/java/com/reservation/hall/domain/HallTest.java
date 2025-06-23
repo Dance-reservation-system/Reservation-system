@@ -1,25 +1,40 @@
 package com.reservation.hall.domain;
 
+import com.reservation.hall.domain.exception.InvalidEquipmentNameException;
 import com.reservation.hall.domain.exception.InvalidHallCapacityException;
 import com.reservation.hall.domain.exception.InvalidHallNameException;
+import com.reservation.hall.domain.exception.InvalidHallStatusChangeException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HallTest {
 
     private final HallId validId = new HallId(UUID.randomUUID());
     private final Set<Equipment> validEquipment = Set.of(new Equipment("Pole"), new Equipment("Sound System"));
+    private HallName name;
+    private Capacity capacity;
+    private Hall hall;
+
+    @BeforeEach
+    void setUp() {
+        name = new HallName("Hall");
+        capacity = new Capacity(10);
+        hall = new Hall(validId, name, capacity, validEquipment);
+    }
 
     @Test
     void shouldCreateHall() {
-        Hall hall = new Hall(validId, "Main Hall", 10, validEquipment);
         assertEquals(validId, hall.getId());
-        assertEquals("Main Hall", hall.getName());
-        assertEquals(10, hall.getCapacity());
+        assertEquals(name, hall.getName());
+        assertEquals(capacity, hall.getCapacity());
         assertEquals(validEquipment, hall.getEquipment());
         assertTrue(hall.isActive());
     }
@@ -27,87 +42,119 @@ class HallTest {
     @Test
     void shouldThrowWhenCreatingHallWithEmptyName() {
         assertThrows(InvalidHallNameException.class,
-                () -> new Hall(validId, " ", 10, validEquipment));
+                () -> new Hall(validId, new HallName(" "), capacity, validEquipment));
     }
 
     @Test
     void shouldThrowWhenCreatingHallWithInvalidCapacity() {
         assertThrows(InvalidHallCapacityException.class,
-                () -> new Hall(validId, "Hall A", 0, validEquipment));
+                () -> new Hall(validId, name, new Capacity(0), validEquipment));
     }
 
     @Test
     void shouldRenameHallWithValidName() {
-        Hall hall = new Hall(validId, "Old Name", 10, validEquipment);
-        hall.rename("New Name");
-        assertEquals("New Name", hall.getName());
+        hall.rename(new HallName("New Name"));
+
+        assertEquals(new HallName("New Name"), hall.getName());
     }
 
     @Test
     void shouldThrowWhenRenamingHallWithEmptyName() {
-        Hall hall = new Hall(validId, "Old Name", 10, validEquipment);
-        assertThrows(InvalidHallNameException.class, () -> hall.rename(" "));
+        assertThrows(InvalidHallNameException.class, () -> hall.rename(new HallName(" ")));
     }
 
     @Test
     void shouldResizeHallWithValidCapacity() {
-        Hall hall = new Hall(validId, "Hall", 10, validEquipment);
-        hall.resize(20);
-        assertEquals(20, hall.getCapacity());
+        hall.resize(new Capacity(20));
+
+        assertEquals(new Capacity(20), hall.getCapacity());
     }
 
     @Test
     void shouldThrowWhenResizingHallWithInvalidCapacity() {
-        Hall hall = new Hall(validId, "Hall", 10, validEquipment);
-        assertThrows(InvalidHallCapacityException.class, () -> hall.resize(0));
+        assertThrows(InvalidHallCapacityException.class, () -> hall.resize(new Capacity(0)));
     }
 
     @Test
     void shouldUpdateEquipment() {
-        Hall hall = new Hall(validId, "Hall", 10, validEquipment);
         Set<Equipment> newEquipment = Set.of(new Equipment("Resistance Bands"));
         hall.updateEquipments(newEquipment);
+
         assertEquals(newEquipment, hall.getEquipment());
     }
 
     @Test
+    void shouldThrowWhenUpdatingEquipmentWithNull() {
+        assertThrows(NullPointerException.class, () -> hall.updateEquipments(null));
+    }
+
+    @Test
+    void shouldThrowWhenUpdatingEquipmentWithEmptySet() {
+        assertThrows(InvalidEquipmentNameException.class, () -> hall.updateEquipments(Set.of(new Equipment(" "))));
+    }
+
+    @Test
     void shouldDeactivateHall() {
-        Hall hall = new Hall(validId, "Hall", 10, validEquipment);
         hall.deactivate();
+
         assertFalse(hall.isActive());
         assertEquals(HallStatus.INACTIVE, hall.getStatus());
     }
 
     @Test
+    void shouldThrowWhenDeactivatingAlreadyInactiveHall() {
+        hall.deactivate();
+
+        assertThrows(InvalidHallStatusChangeException.class, hall::deactivate);
+    }
+
+    @Test
     void shouldActivateHall() {
-        Hall hall = new Hall(validId, "Hall", 10, validEquipment);
         hall.deactivate();
         hall.activate();
+
         assertTrue(hall.isActive());
         assertEquals(HallStatus.ACTIVE, hall.getStatus());
     }
 
     @Test
+    void shouldThrowWhenActivatingAlreadyActiveHall() {
+        assertThrows(InvalidHallStatusChangeException.class, hall::activate);
+    }
+
+    @Test
     void shouldMarkHallAsUnderMaintenance() {
-        Hall hall = new Hall(validId, "Hall", 10, validEquipment);
         hall.markUnderMaintenance();
+
         assertFalse(hall.isActive());
         assertEquals(HallStatus.UNDER_MAINTENANCE, hall.getStatus());
     }
 
     @Test
-    void shouldReturnTrueIfCanHostSessionWithEnoughCapacity() {
-        Hall hall = new Hall(validId, "Hall", 10, validEquipment);
-        assertTrue(hall.canHostSessionWithCapacity(5));
-        assertTrue(hall.canHostSessionWithCapacity(10));
+    void shouldThrowWhenMarkingAlreadyUnderMaintenanceHall() {
+        hall.markUnderMaintenance();
+
+        assertThrows(InvalidHallStatusChangeException.class, hall::markUnderMaintenance);
     }
 
     @Test
-    void shouldReturnFalseIfCannotHostSessionDueToInactiveOrInsufficientCapacity() {
-        Hall hall = new Hall(validId, "Hall", 10, validEquipment);
-        assertFalse(hall.canHostSessionWithCapacity(15));
+    void shouldReturnTrueIfCanHostSessionWithEnoughCapacity() {
+        assertTrue(hall.canHostSessionWithCapacity(new Capacity(5)));
+        assertTrue(hall.canHostSessionWithCapacity(capacity));
+    }
 
+    @Test
+    void shouldReturnFalseIfCapacityIsInsufficient() {
+        Capacity requiredCapacity = new Capacity(15);
+
+        assertFalse(hall.canHostSessionWithCapacity(requiredCapacity));
+    }
+
+    @Test
+    void shouldReturnFalseIfHallIsInactive() {
         hall.deactivate();
-        assertFalse(hall.canHostSessionWithCapacity(5));
+        Capacity requiredCapacity = new Capacity(5);
+
+        assertFalse(hall.canHostSessionWithCapacity(requiredCapacity));
     }
 }
