@@ -8,7 +8,7 @@ record SessionId(UUID value) {
         Objects.requireNonNull(value);
     }
 
-    public static UUID next() {
-        return UUID.randomUUID();
+    public static SessionId next() {
+        return new SessionId(UUID.randomUUID());
     }
 }
