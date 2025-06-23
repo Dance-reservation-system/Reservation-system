@@ -1,6 +1,6 @@
 package com.reservation.event.domain;
 
-public enum SessionOccurrenceStatus {
+enum SessionOccurrenceStatus {
     SCHEDULED,
     CANCELLED,
     COMPLETED
