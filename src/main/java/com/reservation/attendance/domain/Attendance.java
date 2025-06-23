@@ -1,6 +1,7 @@
 package com.reservation.attendance.domain;
 
 import com.reservation.attendance.domain.exception.AttendanceAlreadyCancelledException;
+import com.reservation.attendance.domain.exception.AttendanceCannotBeCancelledException;
 import com.reservation.attendance.domain.exception.DuplicateAttendanceException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -41,8 +42,9 @@ public class Attendance {
             throw new AttendanceAlreadyCancelledException();
         }
         if (status != AttendanceStatus.CREATED) {
-            this.status = AttendanceStatus.CANCELLED;
+            throw new AttendanceCannotBeCancelledException(status.name());
         }
+        this.status = AttendanceStatus.CANCELLED;
     }
 
     public boolean isPresent() {

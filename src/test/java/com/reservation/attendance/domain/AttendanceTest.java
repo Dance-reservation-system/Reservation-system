@@ -2,11 +2,11 @@ package com.reservation.attendance.domain;
 
 
 import com.reservation.attendance.domain.exception.AttendanceAlreadyCancelledException;
+import com.reservation.attendance.domain.exception.AttendanceCannotBeCancelledException;
 import com.reservation.attendance.domain.exception.DuplicateAttendanceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,8 +27,8 @@ class AttendanceTest {
     }
 
     @Test
-    void markingClientAsPresentShouldSucceed(){
-        //Given & When
+    void shouldMarkClientAsPresentWhenNotAlreadyPresent(){
+        // Given & When
         attendance.markPresent();
 
         // Then
@@ -38,60 +38,57 @@ class AttendanceTest {
     }
 
     @Test
-    void markPresentShouldThrowExceptionWhenIsAlreadyPresent(){
-        //Given
+    void shouldThrowExceptionWhenMarkingClientAsPresentTwice(){
+        // Given
         attendance.markPresent();
 
-        //When & Then
+        // When & Then
         assertThrows(DuplicateAttendanceException.class,
                 () -> attendance.markPresent());
     }
 
     @Test
-    void cancelAttendanceShouldSucceed(){
-        //Given
-        attendance.markPresent();
-
+    void shouldCancelAttendanceWhenInCreatedStatus() {
         // When
         attendance.cancel();
 
-        //Then
+        // Then
         assertEquals(AttendanceStatus.CANCELLED, attendance.getStatus());
     }
 
     @Test
-    void shouldThrowExceptionWhenCancellingAlreadyCancelledAttendance(){
-        //Given
+    void shouldThrowExceptionWhenCancellingPresentAttendance() {
+        // Given
         attendance.markPresent();
 
-        // When
+        // When & Then
+        assertThrows(AttendanceCannotBeCancelledException.class, attendance::cancel);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCancellingAlreadyCancelledAttendance() {
+        // Given
         attendance.cancel();
 
-        //Then
+        // When & Then
         assertThrows(AttendanceAlreadyCancelledException.class, attendance::cancel);
     }
 
     @Test
-    void shouldConfirmPresenceFlag(){
-        //Given
-       attendance.markPresent();
+    void shouldConfirmPresenceFlag() {
+        // When
+        attendance.markPresent();
 
-        //When
-        boolean present = attendance.isPresent();
-
-        //Then
-        assertTrue(present);
+        // Then
+        assertTrue(attendance.isPresent());
     }
 
     @Test
-    void confirmedAtShouldNotBeNullWhenMarkedPresent() {
-        // Given
+    void shouldSetConfirmedAtWhenAttendanceIsMarkedPresent() {
+        // When
         attendance.markPresent();
 
-        // When
-        LocalDateTime confirmedAtFromAttendance = attendance.getConfirmedAt();
-
         // Then
-        assertNotNull(confirmedAtFromAttendance, "confirmedAt should not be null when attendance is marked present");
+        assertNotNull(attendance.getConfirmedAt());
     }
 }
