@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,9 +20,9 @@ class AttendanceTest {
 
     @BeforeEach
     void setUp() {
-        attendanceId = new AttendanceId(UUID.randomUUID());
-        clientId = new ClientId(UUID.randomUUID());
-        sessionId = new SessionOccurrenceId(UUID.randomUUID());
+        attendanceId = AttendanceId.next();
+        clientId = ClientId.next();
+        sessionId = SessionOccurrenceId.next();
         attendance = new Attendance(attendanceId, clientId, sessionId);
     }
 
