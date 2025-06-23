@@ -1,5 +1,6 @@
 package com.reservation.event.domain;
 
+import com.reservation.event.domain.exception.SessionOccurrenceAlreadyCanceledException;
 import com.reservation.event.domain.exception.SessionOccurrenceNotStartedException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -37,6 +38,9 @@ public class SessionOccurrence {
     }
 
     public void cancel(){
+        if (status == SessionOccurrenceStatus.CANCELLED){
+            throw new SessionOccurrenceAlreadyCanceledException();
+        }
         if (status == SessionOccurrenceStatus.SCHEDULED) {
             status = SessionOccurrenceStatus.CANCELLED;
         }

@@ -1,5 +1,6 @@
 package com.reservation.event.domain;
 
+import com.reservation.event.domain.exception.SessionOccurrenceAlreadyCanceledException;
 import com.reservation.event.domain.exception.SessionOccurrenceNotStartedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,18 @@ class SessionOccurrenceTest {
 
         //Then
         assertEquals(SessionOccurrenceStatus.CANCELLED, sessionOccurrence.getStatus());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenTryToCancelAlreadyCancelled() {
+        //Given
+        SessionOccurrence sessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
+                sessionId, occurrenceStartDate, occurrenceDuration);
+        sessionOccurrence.cancel();
+
+        //When & Then
+        assertThrows(SessionOccurrenceAlreadyCanceledException.class,
+                sessionOccurrence::cancel);
     }
 
     @Test
