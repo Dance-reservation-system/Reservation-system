@@ -84,10 +84,10 @@ class SessionOccurrenceTest {
                 sessionId, occurrenceStartDate, occurrenceDuration);
 
         //When
-        sessionOccurrence.isActive();
+        boolean isActive = sessionOccurrence.isActive();
 
         //Then
-        assertTrue(sessionOccurrence.isActive());
+        assertTrue(isActive);
     }
 
     @Test
@@ -98,9 +98,9 @@ class SessionOccurrenceTest {
         sessionOccurrence.cancel();
 
         //When
-        sessionOccurrence.isActive();
+        boolean isActive = sessionOccurrence.isActive();
 
         //Then
-        assertFalse(sessionOccurrence.isActive());
+        assertFalse(isActive);
     }
 }
