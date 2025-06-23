@@ -18,7 +18,7 @@ class SystemUserTest {
     @Test
     void shouldCreateSystemUserWithValidRole() {
         UUID keycloakId = UUID.randomUUID();
-        SystemUser user = new SystemUser(keycloakId, Set.of(UserRole.OWNER));
+        SystemUser user = new SystemUser(keycloakId, true, Set.of(UserRole.OWNER));
 
         assertThat(user.getKeycloakUserId()).isEqualTo(keycloakId);
         assertThat(user.getRoles().contains(UserRole.OWNER)).isTrue();
@@ -27,14 +27,14 @@ class SystemUserTest {
 
     @Test
     void shouldThrowExceptionForInvalidRole() {
-        assertThatThrownBy(() -> new SystemUser(UUID.randomUUID(), Set.of()))
+        assertThatThrownBy(() -> new SystemUser(UUID.randomUUID(), true, Set.of()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void shouldNotAllowDeactivationOfSelf() {
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, Set.of(UserRole.OWNER));
+        SystemUser user = new SystemUser(userId,true, Set.of(UserRole.OWNER));
 
         assertThatThrownBy(() -> user.deactivate(userId))
                 .isInstanceOf(SelfDeactivationException.class);
@@ -44,7 +44,7 @@ class SystemUserTest {
     void shouldDeactivateAndActivateUser() {
         UUID userId = UUID.randomUUID();
         UUID adminId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, Set.of(UserRole.CLIENT));
+        SystemUser user = new SystemUser(userId,true,Set.of(UserRole.CLIENT));
 
         user.deactivate(adminId);
         assertThat(user.isActive()).isFalse();
@@ -55,7 +55,7 @@ class SystemUserTest {
 
     @Test
     void shouldChangeRoleIfValid() {
-        SystemUser user = new SystemUser(UUID.randomUUID(), Set.of(UserRole.CLIENT));
+        SystemUser user = new SystemUser(UUID.randomUUID(),true, Set.of(UserRole.CLIENT));
         user.replaceRoles(Set.of(UserRole.OWNER));
 
         assertThat(user.getRoles()).contains(UserRole.OWNER);
@@ -64,7 +64,7 @@ class SystemUserTest {
     @Test
     void shouldThrowExceptionWhenActivatingAlreadyActiveUser() {
         UUID userId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, Set.of(UserRole.CLIENT));
+        SystemUser user = new SystemUser(userId,true, Set.of(UserRole.CLIENT));
 
         assertThatThrownBy(user::activate)
                 .isInstanceOf(UserAlreadyActiveException.class);
@@ -74,7 +74,7 @@ class SystemUserTest {
     void shouldThrowExceptionWhenDeactivatingAlreadyInactiveUser() {
         UUID userId = UUID.randomUUID();
         UUID adminId = UUID.randomUUID();
-        SystemUser user = new SystemUser(userId, Set.of(UserRole.CLIENT));
+        SystemUser user = new SystemUser(userId,true, Set.of(UserRole.CLIENT));
 
         user.deactivate(adminId);
 
@@ -83,7 +83,7 @@ class SystemUserTest {
     }
     @Test
     void rolesShouldBeUnmodifiable() {
-        SystemUser user = new SystemUser(UUID.randomUUID(), Set.of(UserRole.CLIENT));
+        SystemUser user = new SystemUser(UUID.randomUUID(),true, Set.of(UserRole.CLIENT));
         assertThatThrownBy(() -> user.getRoles().add(UserRole.OWNER))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
