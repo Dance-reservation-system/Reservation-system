@@ -30,11 +30,12 @@ class HallTest {
     }
 
     @Test
+
     void shouldCreateHall() {
-        assertEquals(validId, hall.getId());
-        assertEquals(name, hall.getName());
-        assertEquals(capacity, hall.getCapacity());
-        assertEquals(validEquipment, hall.getEquipment());
+        assertEquals(validId, hall.getHallId());
+        assertTrue(hall.hasName(name));
+        assertTrue(hall.hasCapacity(capacity));
+        assertEquipmentContains(validEquipment);
         assertTrue(hall.isActive());
     }
 
@@ -52,9 +53,10 @@ class HallTest {
 
     @Test
     void shouldRenameHallWithValidName() {
-        hall.rename(new HallName("New Name"));
+        HallName newName = new HallName("New Hall");
+        hall.rename(newName);
 
-        assertEquals(new HallName("New Name"), hall.getName());
+        assertTrue(hall.hasName(newName));
     }
 
     @Test
@@ -64,9 +66,10 @@ class HallTest {
 
     @Test
     void shouldResizeHallWithValidCapacity() {
-        hall.resize(new Capacity(20));
+        Capacity newCapacity = new Capacity(20);
+        hall.resize(newCapacity);
 
-        assertEquals(new Capacity(20), hall.getCapacity());
+        assertTrue(hall.hasCapacity(newCapacity));
     }
 
     @Test
@@ -77,27 +80,25 @@ class HallTest {
     @Test
     void shouldUpdateEquipment() {
         Set<Equipment> newEquipment = Set.of(new Equipment("Resistance Bands"));
-        hall.updateEquipments(newEquipment);
-
-        assertEquals(newEquipment, hall.getEquipment());
+        hall.updateEquipment(newEquipment);
+        assertEquipmentContains(newEquipment);
     }
 
     @Test
     void shouldThrowWhenUpdatingEquipmentWithNull() {
-        assertThrows(NullPointerException.class, () -> hall.updateEquipments(null));
+        assertThrows(NullPointerException.class, () -> hall.updateEquipment(null));
     }
 
     @Test
     void shouldThrowWhenUpdatingEquipmentWithEmptySet() {
-        assertThrows(InvalidEquipmentNameException.class, () -> hall.updateEquipments(Set.of(new Equipment(" "))));
+        assertThrows(InvalidEquipmentNameException.class, () -> hall.updateEquipment(Set.of(new Equipment(" "))));
     }
 
     @Test
     void shouldDeactivateHall() {
         hall.deactivate();
 
-        assertFalse(hall.isActive());
-        assertEquals(HallStatus.INACTIVE, hall.getStatus());
+        assertTrue(hall.isInactive());
     }
 
     @Test
@@ -113,7 +114,6 @@ class HallTest {
         hall.activate();
 
         assertTrue(hall.isActive());
-        assertEquals(HallStatus.ACTIVE, hall.getStatus());
     }
 
     @Test
@@ -125,8 +125,7 @@ class HallTest {
     void shouldMarkHallAsUnderMaintenance() {
         hall.markUnderMaintenance();
 
-        assertFalse(hall.isActive());
-        assertEquals(HallStatus.UNDER_MAINTENANCE, hall.getStatus());
+        assertTrue(hall.isUnderMaintenance());
     }
 
     @Test
@@ -155,5 +154,11 @@ class HallTest {
         Capacity requiredCapacity = new Capacity(5);
 
         assertFalse(hall.canHostSessionWithCapacity(requiredCapacity));
+    }
+
+    private void assertEquipmentContains(Set<Equipment> expectedEquipment) {
+        for (Equipment equipment : expectedEquipment) {
+            assertTrue(hall.supportsEquipment(equipment));
+        }
     }
 }

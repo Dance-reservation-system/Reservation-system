@@ -2,12 +2,10 @@ package com.reservation.hall.domain;
 
 import com.reservation.hall.domain.exception.InvalidHallStatusChangeException;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import java.util.Objects;
 import java.util.Set;
 
-@Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Hall {
     @EqualsAndHashCode.Include
@@ -20,7 +18,7 @@ public class Hall {
     private Hall(HallId id, HallName name, Capacity capacity, Set<Equipment> equipment) {
         this.id = Objects.requireNonNull(id);
         this.name = Objects.requireNonNull(name);
-        this.capacity = capacity;
+        this.capacity = Objects.requireNonNull(capacity);
         this.equipment = Set.copyOf(Objects.requireNonNull(equipment));
         this.status = HallStatus.ACTIVE;
     }
@@ -29,15 +27,19 @@ public class Hall {
         return new Hall(id, name, capacity, equipment);
     }
 
+    public HallId getHallId() {
+        return this.id;
+    }
+
     public void rename(HallName name) {
         this.name = Objects.requireNonNull(name);
     }
 
     public void resize(Capacity capacity) {
-        this.capacity = capacity;
+        this.capacity = Objects.requireNonNull(capacity);
     }
 
-    public void updateEquipments(Set<Equipment> equipment) {
+    public void updateEquipment(Set<Equipment> equipment) {
         this.equipment = Set.copyOf(Objects.requireNonNull(equipment));
     }
 
@@ -62,8 +64,28 @@ public class Hall {
         this.status = HallStatus.UNDER_MAINTENANCE;
     }
 
+    public boolean hasName(HallName name) {
+        return this.name.equals(Objects.requireNonNull(name));
+    }
+
+    public boolean hasCapacity(Capacity capacity) {
+        return this.capacity.equals(Objects.requireNonNull(capacity));
+    }
+
+    public boolean supportsEquipment(Equipment equipment) {
+        return this.equipment.contains(Objects.requireNonNull(equipment));
+    }
+
     public boolean isActive() {
         return this.status == HallStatus.ACTIVE;
+    }
+
+    public boolean isInactive() {
+        return this.status == HallStatus.INACTIVE;
+    }
+
+    public boolean isUnderMaintenance() {
+        return this.status == HallStatus.UNDER_MAINTENANCE;
     }
 
     public boolean canHostSessionWithCapacity(Capacity requiredCapacity) {
