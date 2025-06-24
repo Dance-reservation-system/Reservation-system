@@ -3,6 +3,7 @@ package com.reservation.useraccess.domain;
 import com.reservation.useraccess.domain.exception.SelfDeactivationException;
 import com.reservation.useraccess.domain.exception.UserAlreadyActiveException;
 import com.reservation.useraccess.domain.exception.UserAlreadyInactiveException;
+import com.reservation.useraccess.domain.exception.UserRolesEmptyException;
 
 import java.util.Objects;
 import java.util.Set;
@@ -13,13 +14,13 @@ public final class SystemUser {
     private final UUID keycloakUserId;
     private Set<UserRole> roles;
 
-    public SystemUser(UUID keycloakUserId, Set<UserRole> roles) {
+    public SystemUser(UUID keycloakUserId, boolean active, Set<UserRole> roles) {
         this.keycloakUserId = Objects.requireNonNull(keycloakUserId);
         this.roles = Set.copyOf(Objects.requireNonNull(roles));
         if (this.roles.isEmpty()) {
-            throw new IllegalArgumentException("User must have at least one role");
+            throw new UserRolesEmptyException();
         }
-        active = true;
+        this.active = active;
     }
 
     public Set<UserRole> getRoles() {
@@ -54,7 +55,7 @@ public final class SystemUser {
     public void replaceRoles(Set<UserRole> roles) {
         Set<UserRole> copiedRoles = Set.copyOf(Objects.requireNonNull(roles, "Roles cannot be null"));
         if (copiedRoles.isEmpty()) {
-            throw new IllegalArgumentException("User must have at least one role");
+            throw new UserRolesEmptyException();
         }
         this.roles = copiedRoles;
     }
