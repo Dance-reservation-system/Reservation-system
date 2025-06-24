@@ -37,12 +37,9 @@ jobs:
           else
             SANITIZED_COMMENT=$(echo "$COMMENT_BODY" | tr '\n' ' ')
             echo "COMMENT=$SANITIZED_COMMENT" >> $GITHUB_ENV
-            if [ -n "${{ github.event.issue.labels }}" ]; then
-              LABELS=$(echo '${{ toJSON(github.event.issue.labels) }}' | jq -r '.[].name' | paste -sd ',' -)
-              if [ -z "$LABELS" ]; then
-                LABELS="none"
-              fi
-            else
+
+            LABELS=$(echo '${{ toJSON(github.event.issue.labels) }}' | jq -r '.[].name' | paste -sd ',' -)
+            if [ -z "$LABELS" ]; then
               LABELS="none"
             fi
             echo "LABELS=$LABELS" >> $GITHUB_ENV
@@ -55,17 +52,18 @@ jobs:
             echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//'
           }
 
-          # extract raw ticket and lowercase version
-          TICKET_RAW=$(echo "$COMMENT" | grep -oE '[A-Za-z]+-[0-9]+' | head -n1)
-          TICKET=$(echo "$TICKET_RAW" | tr '[:upper:]' '[:lower:]')
+          # Clean HTML from comment
+          PLAIN_COMMENT=$(echo "$COMMENT" | sed -E 's/<[^>]+>//g')
+
+          # Extract ticket and title from clean text
+          TICKET=$(echo "$PLAIN_COMMENT" | grep -oE '[A-Za-z]+-[0-9]+' | head -n1 | tr '[:upper:]' '[:lower:]')
+          TITLE=$(echo "$PLAIN_COMMENT" | head -n1 | sed -E 's/^[A-Za-z]+-[0-9]+[[:space:]]*//')
 
           if [ -z "$TICKET" ]; then
             echo "No valid ticket ID found in comment"
             exit 1
           fi
 
-          # remove raw ticket ID (case-sensitive match) from first line
-          TITLE=$(echo "$COMMENT" | head -n1 | sed -E "s/^$TICKET_RAW[[:space:]]*//" | sed -E 's/<[^>]*>//g' | sed -E 's/\[.*\]\(.*\)//g')
           SLUG=$(slugify "$TITLE")
 
           case "$LABELS" in
