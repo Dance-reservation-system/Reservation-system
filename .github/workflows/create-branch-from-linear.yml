@@ -37,7 +37,7 @@ jobs:
           else
             SANITIZED_COMMENT=$(echo "$COMMENT_BODY" | tr '\n' ' ')
             echo "COMMENT=$SANITIZED_COMMENT" >> $GITHUB_ENV
-      
+
             LABELS=$(echo '${{ toJSON(github.event.issue.labels) }}' | jq -r '.[].name' | paste -sd ',' -)
             if [ -z "$LABELS" ]; then
               LABELS="none"
@@ -52,16 +52,17 @@ jobs:
             echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//'
           }
 
-          TICKET=$(echo "$COMMENT" | grep -oE '[A-Za-z]+-[0-9]+' | head -n1 | tr '[:upper:]' '[:lower:]')
+          # extract raw ticket and lowercase version
+          TICKET_RAW=$(echo "$COMMENT" | grep -oE '[A-Za-z]+-[0-9]+' | head -n1)
+          TICKET=$(echo "$TICKET_RAW" | tr '[:upper:]' '[:lower:]')
 
           if [ -z "$TICKET" ]; then
             echo "No valid ticket ID found in comment"
             exit 1
           fi
 
-          # Get first line, strip ticket, remove HTML or markdown links
-          TITLE=$(echo "$COMMENT" | head -n1 | sed -E "s/^$TICKET[[:space:]]*//" | sed -E 's/<[^>]*>//g' | sed -E 's/\[.*\]\(.*\)//g')
-
+          # remove raw ticket ID (case-sensitive match) from first line
+          TITLE=$(echo "$COMMENT" | head -n1 | sed -E "s/^$TICKET_RAW[[:space:]]*//" | sed -E 's/<[^>]*>//g' | sed -E 's/\[.*\]\(.*\)//g')
           SLUG=$(slugify "$TITLE")
 
           case "$LABELS" in
@@ -91,12 +92,10 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git fetch origin develop
-
           if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
             echo "Branch $BRANCH_NAME already exists. Skipping creation."
             exit 0
           fi
-
           git checkout -b "$BRANCH_NAME" origin/develop
           git push origin "$BRANCH_NAME"
 
