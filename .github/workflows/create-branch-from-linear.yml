@@ -37,9 +37,12 @@ jobs:
           else
             SANITIZED_COMMENT=$(echo "$COMMENT_BODY" | tr '\n' ' ')
             echo "COMMENT=$SANITIZED_COMMENT" >> $GITHUB_ENV
-
-            LABELS=$(echo '${{ toJSON(github.event.issue.labels) }}' | jq -r '.[].name' | paste -sd ',' -)
-            if [ -z "$LABELS" ]; then
+            if [ -n "${{ github.event.issue.labels }}" ]; then
+              LABELS=$(echo '${{ toJSON(github.event.issue.labels) }}' | jq -r '.[].name' | paste -sd ',' -)
+              if [ -z "$LABELS" ]; then
+                LABELS="none"
+              fi
+            else
               LABELS="none"
             fi
             echo "LABELS=$LABELS" >> $GITHUB_ENV
