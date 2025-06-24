@@ -37,12 +37,20 @@ jobs:
           else
             SANITIZED_COMMENT=$(echo "$COMMENT_BODY" | tr '\n' ' ')
             echo "COMMENT=$SANITIZED_COMMENT" >> $GITHUB_ENV
-            echo "LABELS=$(echo '${{ toJSON(github.event.issue.labels) }}' | jq -r '.[].name' | paste -sd ',' -)" >> $GITHUB_ENV
+            LABELS=$(echo '${{ toJSON(github.event.issue.labels) }}' | jq -r '.[].name' | paste -sd ',' -)
+            if [ -z "$LABELS" ]; then
+              LABELS="none"
+            fi
+            echo "LABELS=$LABELS" >> $GITHUB_ENV
           fi
 
       - name: Extract branch name and determine prefix
         id: extract
         run: |
+          slugify() {
+            echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//'
+          }
+
           TICKET=$(echo "$COMMENT" | grep -oE '[A-Za-z]+-[0-9]+' | head -n1 | tr '[:upper:]' '[:lower:]')
 
           if [ -z "$TICKET" ]; then
@@ -50,20 +58,18 @@ jobs:
             exit 1
           fi
 
-          # We extract only the first line, remove the ticket ID from it, and clean up the rest
-          TITLE=$(echo "$COMMENT" | head -n1 | sed -E "s/^$TICKET[[:space:]]*//")
-          SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+          # Get first line, strip ticket, remove HTML or markdown links
+          TITLE=$(echo "$COMMENT" | head -n1 | sed -E "s/^$TICKET[[:space:]]*//" | sed -E 's/<[^>]*>//g' | sed -E 's/\[.*\]\(.*\)//g')
 
-          PREFIX="feature"
-          if echo "$LABELS" | grep -iqE "(bug|fix)"; then
-            PREFIX="bugfix"
-          elif echo "$LABELS" | grep -iq "chore"; then
-            PREFIX="chore"
-          elif echo "$LABELS" | grep -iqE "(docs|documentation)"; then
-            PREFIX="docs"
-          elif echo "$LABELS" | grep -iqE "(feature|enhancement)"; then
-            PREFIX="feature"
-          fi
+          SLUG=$(slugify "$TITLE")
+
+          case "$LABELS" in
+            *bug*|*fix*) PREFIX="bugfix" ;;
+            *chore*) PREFIX="chore" ;;
+            *docs*|*documentation*) PREFIX="docs" ;;
+            *feature*|*enhancement*) PREFIX="feature" ;;
+            *) PREFIX="feature" ;;
+          esac
 
           if [ -z "$SLUG" ]; then
             BRANCH_NAME="${PREFIX}/${TICKET}"
@@ -84,10 +90,12 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git fetch origin develop
+
           if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
-            echo "Branch $BRANCH_NAME already exists. Exiting."
-            exit 1
+            echo "Branch $BRANCH_NAME already exists. Skipping creation."
+            exit 0
           fi
+
           git checkout -b "$BRANCH_NAME" origin/develop
           git push origin "$BRANCH_NAME"
 
