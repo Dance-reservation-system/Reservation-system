@@ -44,7 +44,7 @@ public class Hall {
     }
 
     public void activate() {
-        if(this.status == HallStatus.ACTIVE) {
+        if(isActive()) {
             throw new InvalidHallStatusChangeException("Hall is already active");
         }
         this.status = HallStatus.ACTIVE;
@@ -65,15 +65,15 @@ public class Hall {
     }
 
     public boolean hasName(HallName name) {
-        return this.name.equals(Objects.requireNonNull(name));
+        return Objects.equals(this.name, name);
     }
 
     public boolean hasCapacity(Capacity capacity) {
-        return this.capacity.equals(Objects.requireNonNull(capacity));
+        return Objects.equals(this.capacity, capacity);
     }
 
     public boolean supportsEquipment(Equipment equipment) {
-        return this.equipment.contains(Objects.requireNonNull(equipment));
+        return equipment != null && this.equipment.contains(equipment);
     }
 
     public boolean isActive() {
