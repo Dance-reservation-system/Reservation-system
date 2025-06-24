@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HallTest {
 
-    private final HallId validId = new HallId(UUID.randomUUID());
+    private final HallId validId = HallId.next();
     private final Set<Equipment> validEquipment = Set.of(new Equipment("Pole"), new Equipment("Sound System"));
     private HallName name;
     private Capacity capacity;
@@ -27,7 +26,7 @@ class HallTest {
     void setUp() {
         name = new HallName("Hall");
         capacity = new Capacity(10);
-        hall = new Hall(validId, name, capacity, validEquipment);
+        hall = Hall.create(validId, name, capacity, validEquipment);
     }
 
     @Test
@@ -42,13 +41,13 @@ class HallTest {
     @Test
     void shouldThrowWhenCreatingHallWithEmptyName() {
         assertThrows(InvalidHallNameException.class,
-                () -> new Hall(validId, new HallName(" "), capacity, validEquipment));
+                () -> Hall.create(validId, new HallName(" "), capacity, validEquipment));
     }
 
     @Test
     void shouldThrowWhenCreatingHallWithInvalidCapacity() {
         assertThrows(InvalidHallCapacityException.class,
-                () -> new Hall(validId, name, new Capacity(0), validEquipment));
+                () -> Hall.create(validId, name, new Capacity(0), validEquipment));
     }
 
     @Test

@@ -1,25 +1,32 @@
 package com.reservation.hall.domain;
 
 import com.reservation.hall.domain.exception.InvalidHallStatusChangeException;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.Objects;
 import java.util.Set;
 
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Hall {
+    @EqualsAndHashCode.Include
     private final HallId id;
     private HallName name;
     private Capacity capacity;
     private Set<Equipment> equipment ;
     private HallStatus status;
 
-    Hall(HallId id, HallName name, Capacity capacity, Set<Equipment> equipment) {
+    private Hall(HallId id, HallName name, Capacity capacity, Set<Equipment> equipment) {
         this.id = Objects.requireNonNull(id);
         this.name = Objects.requireNonNull(name);
         this.capacity = capacity;
         this.equipment = Set.copyOf(Objects.requireNonNull(equipment));
         this.status = HallStatus.ACTIVE;
+    }
+
+    public static Hall create(HallId id, HallName name, Capacity capacity, Set<Equipment> equipment) {
+        return new Hall(id, name, capacity, equipment);
     }
 
     public void rename(HallName name) {
