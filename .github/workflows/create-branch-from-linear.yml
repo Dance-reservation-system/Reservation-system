@@ -21,7 +21,9 @@ on:
 
 jobs:
   create_branch:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.comment.user.login == 'linear' }}
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.user.login, '[bot]'))
     runs-on: ubuntu-latest
     steps:
       - name: Set inputs for manual run or real comment
