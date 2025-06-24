@@ -44,12 +44,14 @@ jobs:
         id: extract
         run: |
           TICKET=$(echo "$COMMENT" | grep -oE '[A-Za-z]+-[0-9]+' | head -n1 | tr '[:upper:]' '[:lower:]')
-          
+
           if [ -z "$TICKET" ]; then
             echo "No valid ticket ID found in comment"
             exit 1
           fi
-          TITLE=$(echo "$COMMENT" | cut -d' ' -f2-)
+
+          # We extract only the first line, remove the ticket ID from it, and clean up the rest
+          TITLE=$(echo "$COMMENT" | head -n1 | sed -E "s/^$TICKET[[:space:]]*//")
           SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
 
           PREFIX="feature"
@@ -82,13 +84,10 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git fetch origin develop
-
-          # Check if branch already exists
           if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
             echo "Branch $BRANCH_NAME already exists. Exiting."
             exit 1
           fi
-
           git checkout -b "$BRANCH_NAME" origin/develop
           git push origin "$BRANCH_NAME"
 
