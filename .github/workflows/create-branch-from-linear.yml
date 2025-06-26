@@ -1,0 +1,118 @@
+name: Create Branch from Linear Bot Comment
+
+permissions:
+  contents: write
+  issues: write
+
+on:
+  issue_comment:
+    types: [created]
+
+  workflow_dispatch:
+    inputs:
+      comment_body:
+        description: "Simulated Linear bot comment"
+        required: true
+        type: string
+      labels:
+        description: "Comma-separated labels (e.g., bug, documentation)"
+        required: false
+        type: string
+
+jobs:
+  create_branch:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.user.login, '[bot]'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set inputs for manual run or real comment
+        id: set_vars
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          if [ -n "${{ github.event.inputs.comment_body }}" ]; then
+            echo "COMMENT=${{ github.event.inputs.comment_body }}" >> $GITHUB_ENV
+            echo "LABELS=${{ github.event.inputs.labels }}" >> $GITHUB_ENV
+          else
+            SANITIZED_COMMENT=$(echo "$COMMENT_BODY" | tr '\n' ' ')
+            echo "COMMENT=$SANITIZED_COMMENT" >> $GITHUB_ENV
+      
+            echo '${{ toJSON(github.event.issue.labels) }}' > labels.json
+            LABELS=$(jq -r '.[].name' labels.json | paste -sd ',' -)
+            rm labels.json
+      
+            if [ -z "$LABELS" ]; then
+              LABELS="none"
+            fi
+            echo "LABELS=$LABELS" >> $GITHUB_ENV
+          fi
+
+      - name: Extract branch name and determine prefix
+        id: extract
+        run: |
+          slugify() {
+            echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//'
+          }
+
+          # Clean HTML from comment
+          PLAIN_COMMENT=$(echo "$COMMENT" | sed -E 's/<[^>]+>//g')
+
+          # Extract ticket and title from clean text
+          TICKET=$(echo "$PLAIN_COMMENT" | grep -oE '[A-Za-z]+-[0-9]+' | head -n1 | tr '[:upper:]' '[:lower:]')
+          TITLE=$(echo "$PLAIN_COMMENT" | head -n1 | sed -E 's/^[A-Za-z]+-[0-9]+[[:space:]]*//')
+
+          if [ -z "$TICKET" ]; then
+            echo "No valid ticket ID found in comment"
+            exit 1
+          fi
+
+          SLUG=$(slugify "$TITLE")
+
+          case "$LABELS" in
+            *bug*|*fix*) PREFIX="bugfix" ;;
+            *chore*) PREFIX="chore" ;;
+            *docs*|*documentation*) PREFIX="docs" ;;
+            *feature*|*enhancement*) PREFIX="feature" ;;
+            *) PREFIX="feature" ;;
+          esac
+
+          if [ -z "$SLUG" ]; then
+            BRANCH_NAME="${PREFIX}/${TICKET}"
+          else
+            BRANCH_NAME="${PREFIX}/${TICKET}-${SLUG}"
+          fi
+
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create and push branch from develop
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git fetch origin develop
+          if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
+            echo "Branch $BRANCH_NAME already exists. Skipping creation."
+            exit 0
+          fi
+          git checkout -b "$BRANCH_NAME" origin/develop
+          git push origin "$BRANCH_NAME"
+
+      - name: Comment with branch link
+        if: github.event_name != 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_URL="${{ github.event.issue.url }}"
+          REPO_URL="https://github.com/${{ github.repository }}"
+          COMMENT_BODY="🚀 Branch [\`${BRANCH_NAME}\`](${REPO_URL}/tree/${BRANCH_NAME}) created from \`develop\`."
+          curl -s -X POST \
+            -H "Authorization: token ${GH_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\":\"${COMMENT_BODY}\"}" \
+            "$ISSUE_URL/comments"

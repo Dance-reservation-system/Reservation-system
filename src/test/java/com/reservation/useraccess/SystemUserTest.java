@@ -1,17 +1,18 @@
 package com.reservation.useraccess;
 
-import com.reservation.useraccess.domain.exception.SelfDeactivationException;
 import com.reservation.useraccess.domain.SystemUser;
 import com.reservation.useraccess.domain.UserRole;
+import com.reservation.useraccess.domain.exception.SelfDeactivationException;
 import com.reservation.useraccess.domain.exception.UserAlreadyActiveException;
 import com.reservation.useraccess.domain.exception.UserAlreadyInactiveException;
+import com.reservation.useraccess.domain.exception.UserRolesEmptyException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SystemUserTest {
 
@@ -27,8 +28,8 @@ class SystemUserTest {
 
     @Test
     void shouldThrowExceptionForInvalidRole() {
-        assertThatThrownBy(() -> new SystemUser(UUID.randomUUID(), true, Set.of()))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThrows(UserRolesEmptyException.class,
+                () -> new SystemUser(UUID.randomUUID(), true, Set.of()));
     }
 
     @Test
@@ -36,8 +37,8 @@ class SystemUserTest {
         UUID userId = UUID.randomUUID();
         SystemUser user = new SystemUser(userId,true, Set.of(UserRole.OWNER));
 
-        assertThatThrownBy(() -> user.deactivate(userId))
-                .isInstanceOf(SelfDeactivationException.class);
+        assertThrows(SelfDeactivationException.class,
+                () -> user.deactivate(userId));
     }
 
     @Test
@@ -66,8 +67,7 @@ class SystemUserTest {
         UUID userId = UUID.randomUUID();
         SystemUser user = new SystemUser(userId,true, Set.of(UserRole.CLIENT));
 
-        assertThatThrownBy(user::activate)
-                .isInstanceOf(UserAlreadyActiveException.class);
+        assertThrows(UserAlreadyActiveException.class, user::activate);
     }
 
     @Test
@@ -78,13 +78,14 @@ class SystemUserTest {
 
         user.deactivate(adminId);
 
-        assertThatThrownBy(() -> user.deactivate(adminId))
-                .isInstanceOf(UserAlreadyInactiveException.class);
+        assertThrows(UserAlreadyInactiveException.class,
+                () -> user.deactivate(adminId));
     }
     @Test
     void rolesShouldBeUnmodifiable() {
         SystemUser user = new SystemUser(UUID.randomUUID(),true, Set.of(UserRole.CLIENT));
-        assertThatThrownBy(() -> user.getRoles().add(UserRole.OWNER))
-                .isInstanceOf(UnsupportedOperationException.class);
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> user.getRoles().add(UserRole.OWNER));
     }
 }
