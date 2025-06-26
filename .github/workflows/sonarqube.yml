@@ -65,6 +65,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: | 
           mvn sonar:sonar \
-          -Dsonar.projectKey=Dance-reservation-system_Kamann-modular \
-          -Dsonar.organization=dance-reservation-system \
-          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+          -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
