@@ -2,6 +2,7 @@ package com.reservation.instructor.domain;
 
 import com.reservation.instructor.domain.exception.InstructorAlreadyActiveException;
 import com.reservation.instructor.domain.exception.InstructorAlreadyInactiveException;
+import com.reservation.instructor.domain.exception.ProfileCannotBeUpdatedWhenInactiveException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +38,7 @@ class InstructorTest {
     void shouldCreateInstructorWithActiveStatus() {
         assertEquals(instructorId, instructor.getInstructorId());
         assertEquals(systemUserId, instructor.getSystemUserId());
-        assertTrue(instructor.hasProfile(instructorProfile));
+        assertTrue(instructor.isSameProfile(instructorProfile));
         assertTrue(instructor.isActive());
     }
 
@@ -49,14 +50,14 @@ class InstructorTest {
 
         instructor.updateProfile(newProfile);
 
-        assertTrue(instructor.hasProfile(newProfile));
+        assertTrue(instructor.isSameProfile(newProfile));
     }
 
     @Test
     void shouldThrowExceptionWhenUpdatingProfileWhileInactive() {
         instructor.deactivate();
 
-        assertThrows(InstructorAlreadyInactiveException.class, () ->
+        assertThrows(ProfileCannotBeUpdatedWhenInactiveException.class, () ->
                 instructor.updateProfile(instructorProfile)
         );
     }

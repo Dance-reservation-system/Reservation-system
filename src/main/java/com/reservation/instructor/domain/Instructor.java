@@ -2,6 +2,7 @@ package com.reservation.instructor.domain;
 
 import com.reservation.instructor.domain.exception.InstructorAlreadyActiveException;
 import com.reservation.instructor.domain.exception.InstructorAlreadyInactiveException;
+import com.reservation.instructor.domain.exception.ProfileCannotBeUpdatedWhenInactiveException;
 import lombok.EqualsAndHashCode;
 
 import java.util.Objects;
@@ -34,27 +35,27 @@ public class Instructor {
     }
 
     public void updateProfile(InstructorProfile profile) {
-        if(this.status.isInactive()) {
-            throw new InstructorAlreadyInactiveException();
+        if(!isActive()) {
+            throw new ProfileCannotBeUpdatedWhenInactiveException();
         }
         this.profile = Objects.requireNonNull(profile);
     }
 
     public void activate() {
-        if (this.status.isActive()) {
+        if (isActive()) {
             throw new InstructorAlreadyActiveException();
         }
         this.status = InstructorStatus.ACTIVE;
     }
 
     public void deactivate() {
-        if (this.status.isInactive()) {
+        if (!isActive()) {
             throw new InstructorAlreadyInactiveException();
         }
         this.status = InstructorStatus.INACTIVE;
     }
 
-    public boolean hasProfile(InstructorProfile profile) {
+    public boolean isSameProfile(InstructorProfile profile) {
         return this.profile.equals(profile);
     }
 
