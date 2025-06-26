@@ -56,7 +56,7 @@ public class Instructor {
     }
 
     public boolean isSameProfile(InstructorProfile profile) {
-        return this.profile.isSameProfile(profile);
+        return this.profile.equals(profile);
     }
 
     public boolean isActive() {

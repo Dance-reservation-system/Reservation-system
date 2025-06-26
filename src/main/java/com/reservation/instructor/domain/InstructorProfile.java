@@ -16,14 +16,4 @@ record InstructorProfile(Name name, Set<Specialty> specialties, Bio bio) {
             throw new InvalidInstructorProfileException("Bio cannot be null");
         }
     }
-
-    public boolean isSameProfile(InstructorProfile profile) {
-        if (profile == null) {
-            return false;
-        }
-        return this.name.equals(profile.name) &&
-               this.specialties.equals(profile.specialties) &&
-               this.bio.equals(profile.bio);
-    }
-
 }
