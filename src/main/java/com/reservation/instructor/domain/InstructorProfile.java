@@ -15,7 +15,15 @@ record InstructorProfile(Name name, Set<Specialty> specialties, Bio bio) {
         if (bio == null) {
             throw new InvalidInstructorProfileException("Bio cannot be null");
         }
-
-        specialties = Set.copyOf(specialties);
     }
+
+    public boolean isSameProfile(InstructorProfile profile) {
+        if (profile == null) {
+            return false;
+        }
+        return this.name.equals(profile.name) &&
+               this.specialties.equals(profile.specialties) &&
+               this.bio.equals(profile.bio);
+    }
+
 }
