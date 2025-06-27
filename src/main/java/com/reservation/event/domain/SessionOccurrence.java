@@ -2,6 +2,7 @@ package com.reservation.event.domain;
 
 import com.reservation.event.domain.exception.SessionOccurrenceAlreadyCanceledException;
 import com.reservation.event.domain.exception.SessionOccurrenceNotStartedException;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -9,7 +10,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Getter
+@Getter(value = AccessLevel.PACKAGE)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SessionOccurrence {
     @EqualsAndHashCode.Include

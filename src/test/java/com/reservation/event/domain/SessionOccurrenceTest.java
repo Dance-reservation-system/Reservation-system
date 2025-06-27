@@ -35,12 +35,14 @@ class SessionOccurrenceTest {
     @Test
     void shouldCreateValidOccurrence() {
         // Given & When
-        SessionOccurrence newSessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
-                sessionId, occurrenceStartDate, occurrenceDuration);
+        SessionOccurrenceId newSessionOccurrenceId = SessionOccurrenceId.next();
+        SessionId newSessionId = SessionId.next();
+        SessionOccurrence newSessionOccurrence = SessionOccurrence.create(newSessionOccurrenceId,
+                newSessionId, occurrenceStartDate, occurrenceDuration);
 
         // Then
-        assertEquals(sessionOccurrenceId, newSessionOccurrence.getId());
-        assertEquals(sessionId, newSessionOccurrence.getSessionId());
+        assertEquals(newSessionOccurrenceId, newSessionOccurrence.getId());
+        assertEquals(newSessionId, newSessionOccurrence.getSessionId());
         assertEquals(occurrenceStartDate, newSessionOccurrence.getStartDateTime());
         assertEquals(occurrenceDuration, newSessionOccurrence.getDuration());
         assertEquals(SessionOccurrenceStatus.SCHEDULED, newSessionOccurrence.getStatus());
@@ -48,10 +50,7 @@ class SessionOccurrenceTest {
 
     @Test
     void shouldCancelScheduledSessionOccurrence() {
-        //Given
-
-
-        //When
+        //Given & When
         sessionOccurrence.cancel();
 
         //Then
