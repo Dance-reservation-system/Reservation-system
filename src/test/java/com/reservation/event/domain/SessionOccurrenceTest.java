@@ -8,7 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 class SessionOccurrenceTest {
 
@@ -24,28 +28,28 @@ class SessionOccurrenceTest {
         sessionOccurrenceId = SessionOccurrenceId.next();
         occurrenceStartDate = LocalDateTime.now().minusDays(5);
         occurrenceDuration = Duration.ofHours(2);
-
+        sessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
+                sessionId, occurrenceStartDate, occurrenceDuration);
     }
 
     @Test
     void shouldCreateValidOccurrence() {
         // Given & When
-        SessionOccurrence sessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
+        SessionOccurrence newSessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
                 sessionId, occurrenceStartDate, occurrenceDuration);
 
         // Then
-        assertEquals(sessionOccurrenceId, sessionOccurrence.getId());
-        assertEquals(sessionId, sessionOccurrence.getSessionId());
-        assertEquals(occurrenceStartDate, sessionOccurrence.getStartDateTime());
-        assertEquals(occurrenceDuration, sessionOccurrence.getDuration());
-        assertEquals(SessionOccurrenceStatus.SCHEDULED, sessionOccurrence.getStatus());
+        assertEquals(sessionOccurrenceId, newSessionOccurrence.getId());
+        assertEquals(sessionId, newSessionOccurrence.getSessionId());
+        assertEquals(occurrenceStartDate, newSessionOccurrence.getStartDateTime());
+        assertEquals(occurrenceDuration, newSessionOccurrence.getDuration());
+        assertEquals(SessionOccurrenceStatus.SCHEDULED, newSessionOccurrence.getStatus());
     }
 
     @Test
     void shouldCancelScheduledSessionOccurrence() {
         //Given
-        SessionOccurrence sessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
-                sessionId, occurrenceStartDate, occurrenceDuration);
+
 
         //When
         sessionOccurrence.cancel();
@@ -57,8 +61,6 @@ class SessionOccurrenceTest {
     @Test
     void shouldThrowExceptionWhenTryToCancelAlreadyCancelled() {
         //Given
-        SessionOccurrence sessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
-                sessionId, occurrenceStartDate, occurrenceDuration);
         sessionOccurrence.cancel();
 
         //When & Then
@@ -68,11 +70,7 @@ class SessionOccurrenceTest {
 
     @Test
     void shouldChangeSessionOccurrenceStatusToCompleted() {
-        //Given
-        SessionOccurrence sessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
-                sessionId, occurrenceStartDate, occurrenceDuration);
-
-        //When
+        //Given & When
         sessionOccurrence.complete();
 
         //Then
@@ -82,21 +80,17 @@ class SessionOccurrenceTest {
     @Test
     void shouldThrowExceptionIfSessionOccurrenceIsNotStartedAndTryToComplete() {
         //Given & When
-        SessionOccurrence sessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
+        SessionOccurrence sessionOccurrenceNotStarted = SessionOccurrence.create(sessionOccurrenceId,
                 sessionId, occurrenceStartDate.plusDays(7), occurrenceDuration);
 
         //Then
         assertThrows(SessionOccurrenceNotStartedException.class,
-                sessionOccurrence::complete);
+                sessionOccurrenceNotStarted::complete);
     }
 
     @Test
     void shouldReturnTrueIfSessionOccurrenceIsScheduled() {
-        //Given
-        SessionOccurrence sessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
-                sessionId, occurrenceStartDate, occurrenceDuration);
-
-        //When
+        //Given & When
         boolean isActive = sessionOccurrence.isActive();
 
         //Then
@@ -106,8 +100,6 @@ class SessionOccurrenceTest {
     @Test
     void shouldReturnFalseIfSessionOccurrenceIsNotScheduled() {
         //Given
-        SessionOccurrence sessionOccurrence = SessionOccurrence.create(sessionOccurrenceId,
-                sessionId, occurrenceStartDate, occurrenceDuration);
         sessionOccurrence.cancel();
 
         //When

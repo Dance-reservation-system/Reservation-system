@@ -19,9 +19,9 @@ public class SessionOccurrence {
     private final Duration duration;
     private SessionOccurrenceStatus status;
 
-    SessionOccurrence(SessionOccurrenceId id, SessionId sessionId,
+    private SessionOccurrence(SessionOccurrenceId id, SessionId sessionId,
                       LocalDateTime startDateTime, Duration duration
-                      ) {
+    ) {
         this.id = Objects.requireNonNull(id);
         this.sessionId = Objects.requireNonNull(sessionId);
         this.startDateTime = Objects.requireNonNull(startDateTime);
@@ -37,8 +37,8 @@ public class SessionOccurrence {
         return new SessionOccurrence(id, sessionId, startDateTime, duration);
     }
 
-    public void cancel(){
-        if (status == SessionOccurrenceStatus.CANCELLED){
+    public void cancel() {
+        if (status == SessionOccurrenceStatus.CANCELLED) {
             throw new SessionOccurrenceAlreadyCanceledException();
         }
         if (status == SessionOccurrenceStatus.SCHEDULED) {
@@ -46,7 +46,7 @@ public class SessionOccurrence {
         }
     }
 
-    public void complete(){
+    public void complete() {
         if (startDateTime.isAfter(LocalDateTime.now())) {
             throw new SessionOccurrenceNotStartedException();
         }
