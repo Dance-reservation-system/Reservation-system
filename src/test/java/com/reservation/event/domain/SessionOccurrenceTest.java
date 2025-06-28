@@ -83,6 +83,16 @@ class SessionOccurrenceTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenTryToChangeSessionOccurrenceAlreadyCanceled() {
+        //Given & When
+        sessionOccurrence.cancel();
+
+        //Then
+        assertThrows(SessionOccurrenceAlreadyCanceledException.class,
+                ()->sessionOccurrence.cancel());
+    }
+
+    @Test
     void shouldThrowExceptionIfSessionOccurrenceIsNotStartedAndTryToComplete() {
         //Given & When
         SessionOccurrence sessionOccurrenceNotStarted = SessionOccurrence.create(sessionOccurrenceId,

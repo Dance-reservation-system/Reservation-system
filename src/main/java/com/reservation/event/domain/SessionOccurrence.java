@@ -54,6 +54,10 @@ public class SessionOccurrence {
             throw new SessionOccurrenceNotStartedException();
         }
 
+        if (isCanceled()) {
+            throw new SessionOccurrenceAlreadyCanceledException();
+        }
+
         if (isScheduled()) {
             status = SessionOccurrenceStatus.COMPLETED;
         }
