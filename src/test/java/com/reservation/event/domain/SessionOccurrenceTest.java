@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,15 +38,19 @@ class SessionOccurrenceTest {
         // Given & When
         SessionOccurrenceId newSessionOccurrenceId = SessionOccurrenceId.next();
         SessionId newSessionId = SessionId.next();
+        Duration newOccurrenceDuration = Duration.ofHours(2);
         SessionOccurrence newSessionOccurrence = SessionOccurrence.create(newSessionOccurrenceId,
-                newSessionId, occurrenceStartDate, occurrenceDuration);
+                newSessionId, occurrenceStartDate, newOccurrenceDuration);
 
         // Then
-        assertEquals(newSessionOccurrenceId, newSessionOccurrence.getId());
-        assertEquals(newSessionId, newSessionOccurrence.getSessionId());
-        assertEquals(occurrenceStartDate, newSessionOccurrence.getStartDateTime());
-        assertEquals(occurrenceDuration, newSessionOccurrence.getDuration());
-        assertEquals(SessionOccurrenceStatus.SCHEDULED, newSessionOccurrence.getStatus());
+        assertAll(
+                () -> assertEquals(newSessionOccurrenceId, newSessionOccurrence.getId()),
+                () -> assertEquals(newSessionId, newSessionOccurrence.getSessionId()),
+                () -> assertTrue(newSessionOccurrence.isScheduled()),
+                () -> assertTrue(newSessionOccurrence.isLongerThan(Duration.ofHours(1))),
+                () -> assertFalse(newSessionOccurrence.isCanceled()),
+                () -> assertFalse(newSessionOccurrence.isCompleted())
+        );
     }
 
     @Test
@@ -54,7 +59,7 @@ class SessionOccurrenceTest {
         sessionOccurrence.cancel();
 
         //Then
-        assertEquals(SessionOccurrenceStatus.CANCELLED, sessionOccurrence.getStatus());
+        assertTrue(sessionOccurrence.isCanceled());
     }
 
     @Test
@@ -73,7 +78,8 @@ class SessionOccurrenceTest {
         sessionOccurrence.complete();
 
         //Then
-        assertEquals(SessionOccurrenceStatus.COMPLETED, sessionOccurrence.getStatus());
+        assertFalse(sessionOccurrence.isScheduled());
+        assertTrue(sessionOccurrence.isCompleted());
     }
 
     @Test
@@ -88,12 +94,22 @@ class SessionOccurrenceTest {
     }
 
     @Test
-    void shouldReturnTrueIfSessionOccurrenceIsScheduled() {
+    void shouldReturnTrueIfSessionOccurrenceIsStarted() {
         //Given & When
-        boolean isActive = sessionOccurrence.isActive();
+        boolean hasStarted = sessionOccurrence.hasStarted();
 
         //Then
-        assertTrue(isActive);
+        assertTrue(hasStarted);
+
+    }
+
+    @Test
+    void shouldReturnTrueIfSessionOccurrenceIsScheduled() {
+        //Given & When
+        boolean isScheduled = sessionOccurrence.isScheduled();
+
+        //Then
+        assertTrue(isScheduled);
     }
 
     @Test
@@ -102,7 +118,7 @@ class SessionOccurrenceTest {
         sessionOccurrence.cancel();
 
         //When
-        boolean isActive = sessionOccurrence.isActive();
+        boolean isActive = sessionOccurrence.isScheduled();
 
         //Then
         assertFalse(isActive);

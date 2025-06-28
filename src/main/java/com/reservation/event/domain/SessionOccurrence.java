@@ -2,7 +2,6 @@ package com.reservation.event.domain;
 
 import com.reservation.event.domain.exception.SessionOccurrenceAlreadyCanceledException;
 import com.reservation.event.domain.exception.SessionOccurrenceNotStartedException;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -10,11 +9,13 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Getter(value = AccessLevel.PACKAGE)
+
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SessionOccurrence {
+    @Getter
     @EqualsAndHashCode.Include
     private final SessionOccurrenceId id;
+    @Getter
     private final SessionId sessionId;
     private final LocalDateTime startDateTime;
     private final Duration duration;
@@ -38,11 +39,12 @@ public class SessionOccurrence {
         return new SessionOccurrence(id, sessionId, startDateTime, duration);
     }
 
+
     public void cancel() {
-        if (status == SessionOccurrenceStatus.CANCELLED) {
+        if (isCanceled()) {
             throw new SessionOccurrenceAlreadyCanceledException();
         }
-        if (status == SessionOccurrenceStatus.SCHEDULED) {
+        if (isScheduled()) {
             status = SessionOccurrenceStatus.CANCELLED;
         }
     }
@@ -52,12 +54,28 @@ public class SessionOccurrence {
             throw new SessionOccurrenceNotStartedException();
         }
 
-        if (status == SessionOccurrenceStatus.SCHEDULED) {
+        if (isScheduled()) {
             status = SessionOccurrenceStatus.COMPLETED;
         }
     }
 
-    public boolean isActive() {
+    public boolean isScheduled() {
         return this.status == SessionOccurrenceStatus.SCHEDULED;
+    }
+
+    public boolean isCanceled() {
+        return this.status == SessionOccurrenceStatus.CANCELLED;
+    }
+
+    public boolean hasStarted() {
+        return !startDateTime.isAfter(LocalDateTime.now());
+    }
+
+    public boolean isLongerThan(Duration otherDuration) {
+        return this.duration.compareTo(otherDuration) > 0;
+    }
+
+    public boolean isCompleted() {
+        return this.status == SessionOccurrenceStatus.COMPLETED;
     }
 }
