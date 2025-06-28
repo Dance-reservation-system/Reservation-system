@@ -89,7 +89,7 @@ class SessionOccurrenceTest {
 
         //Then
         assertThrows(SessionOccurrenceAlreadyCanceledException.class,
-                ()->sessionOccurrence.cancel());
+                ()->sessionOccurrence.complete());
     }
 
     @Test
