@@ -1,4 +1,6 @@
 package com.reservation.event.domain;
 
-public record SessionOccurrenceCreated(SessionOccurrenceId id) {
+import java.time.Instant;
+
+public record SessionOccurrenceCreated(SessionOccurrenceId id, Instant createdAt) implements SessionOccurrenceEvent{
 }

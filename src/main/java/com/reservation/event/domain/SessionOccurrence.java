@@ -1,17 +1,21 @@
 package com.reservation.event.domain;
 
+import com.reservation.common.AggregateRoot;
 import com.reservation.event.domain.exception.SessionOccurrenceAlreadyCanceledException;
 import com.reservation.event.domain.exception.SessionOccurrenceNotStartedException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class SessionOccurrence {
+public class SessionOccurrence implements AggregateRoot<SessionOccurrenceEvent> {
     @Getter
     @EqualsAndHashCode.Include
     private final SessionOccurrenceId id;
@@ -21,6 +25,8 @@ public class SessionOccurrence {
     private final Duration duration;
     private SessionOccurrenceStatus status;
 
+    private final ArrayList<SessionOccurrenceEvent> sessionOccurrenceEvents = new ArrayList<>();
+
     private SessionOccurrence(SessionOccurrenceId id, SessionId sessionId,
                       LocalDateTime startDateTime, Duration duration
     ) {
@@ -29,6 +35,8 @@ public class SessionOccurrence {
         this.startDateTime = Objects.requireNonNull(startDateTime);
         this.duration = Objects.requireNonNull(duration);
         this.status = SessionOccurrenceStatus.SCHEDULED;
+        registerEvent(new SessionOccurrenceCreated(this.id, Instant.now()));
+
     }
 
     public static SessionOccurrence create(
@@ -46,6 +54,7 @@ public class SessionOccurrence {
         }
         if (isScheduled()) {
             status = SessionOccurrenceStatus.CANCELLED;
+            registerEvent(new SessionOccurrenceCancelled(this.id, Instant.now()));
         }
     }
 
@@ -60,8 +69,17 @@ public class SessionOccurrence {
 
         if (isScheduled()) {
             status = SessionOccurrenceStatus.COMPLETED;
+            registerEvent(new SessionOccurrenceCompleted(this.id, Instant.now()));
         }
     }
+
+//    protected void registerEvent(SessionOccurrenceEvent event) {
+//        this.sessionOccurrenceEvents.add(Objects.requireNonNull(event));
+//    }
+//
+//    public List<SessionOccurrenceEvent> getEvents() {
+//        return List.copyOf(sessionOccurrenceEvents);
+//    }
 
     public boolean isScheduled() {
         return this.status == SessionOccurrenceStatus.SCHEDULED;
@@ -81,5 +99,17 @@ public class SessionOccurrence {
 
     public boolean isCompleted() {
         return this.status == SessionOccurrenceStatus.COMPLETED;
+    }
+
+    @Override
+    public List<SessionOccurrenceEvent> pullEvents() {
+        List<SessionOccurrenceEvent> copyEvents = List.copyOf(sessionOccurrenceEvents);
+        sessionOccurrenceEvents.clear();
+        return copyEvents;
+    }
+
+    @Override
+    public void registerEvent(SessionOccurrenceEvent event) {
+        sessionOccurrenceEvents.add(event);
     }
 }

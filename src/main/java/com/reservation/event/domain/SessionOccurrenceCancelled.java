@@ -1,4 +1,6 @@
 package com.reservation.event.domain;
 
-public record SessionOccurrenceCancelled(SessionOccurrenceId id) {
+import java.time.Instant;
+
+public record SessionOccurrenceCancelled(SessionOccurrenceId id, Instant createdAt) implements SessionOccurrenceEvent {
 }
