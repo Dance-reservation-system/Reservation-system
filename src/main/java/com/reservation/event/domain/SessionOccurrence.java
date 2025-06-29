@@ -36,7 +36,6 @@ public class SessionOccurrence implements AggregateRoot<SessionOccurrenceEvent> 
         this.duration = Objects.requireNonNull(duration);
         this.status = SessionOccurrenceStatus.SCHEDULED;
         registerEvent(new SessionOccurrenceCreated(this.id, Instant.now()));
-
     }
 
     public static SessionOccurrence create(
@@ -73,14 +72,6 @@ public class SessionOccurrence implements AggregateRoot<SessionOccurrenceEvent> 
         }
     }
 
-//    protected void registerEvent(SessionOccurrenceEvent event) {
-//        this.sessionOccurrenceEvents.add(Objects.requireNonNull(event));
-//    }
-//
-//    public List<SessionOccurrenceEvent> getEvents() {
-//        return List.copyOf(sessionOccurrenceEvents);
-//    }
-
     public boolean isScheduled() {
         return this.status == SessionOccurrenceStatus.SCHEDULED;
     }
@@ -110,6 +101,6 @@ public class SessionOccurrence implements AggregateRoot<SessionOccurrenceEvent> 
 
     @Override
     public void registerEvent(SessionOccurrenceEvent event) {
-        sessionOccurrenceEvents.add(event);
+        sessionOccurrenceEvents.add(Objects.requireNonNull(event));
     }
 }

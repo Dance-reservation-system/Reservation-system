@@ -1,4 +1,4 @@
 package com.reservation.event.domain;
 
-public interface SessionOccurrenceEvent {
+sealed interface SessionOccurrenceEvent permits SessionOccurrenceCancelled, SessionOccurrenceCompleted, SessionOccurrenceCreated {
 }
