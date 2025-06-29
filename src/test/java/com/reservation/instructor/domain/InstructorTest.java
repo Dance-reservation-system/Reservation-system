@@ -12,6 +12,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -47,7 +48,12 @@ class InstructorTest {
         assertTrue(instructor.isActive());
 
         assertEquals(1, events.size());
-        assertInstanceOf(InstructorCreated.class, events.getFirst());
+        InstructorEvent event = events.getFirst();
+        assertInstanceOf(InstructorCreated.class, event);
+        InstructorCreated createdEvent = (InstructorCreated) event;
+        assertEquals(instructorId, createdEvent.instructorId());
+        assertEquals(systemUserId, createdEvent.systemUserId());
+        assertNotNull(createdEvent.createdAt());
     }
 
     @Test
@@ -61,7 +67,12 @@ class InstructorTest {
 
         assertTrue(instructor.isSameProfile(newProfile));
         assertEquals(2, events.size());
-        assertInstanceOf(InstructorUpdated.class, events.get(1));
+        InstructorEvent event = events.get(1);
+        assertInstanceOf(InstructorUpdated.class, event);
+        InstructorUpdated updatedEvent = (InstructorUpdated) event;
+        assertEquals(instructorId, updatedEvent.instructorId());
+        assertEquals(systemUserId, updatedEvent.systemUserId());
+        assertNotNull(updatedEvent.updatedAt());
     }
 
     @Test
@@ -93,7 +104,12 @@ class InstructorTest {
 
         assertTrue(instructor.isActive());
         assertEquals(3, events.size());
-        assertInstanceOf(InstructorActivated.class, events.get(2));
+        InstructorEvent event = events.get(2);
+        assertInstanceOf(InstructorActivated.class, event);
+        InstructorActivated activeEvent = (InstructorActivated) event;
+        assertEquals(instructorId, activeEvent.instructorId());
+        assertEquals(systemUserId, activeEvent.systemUserId());
+        assertNotNull(activeEvent.activationAt());
     }
 
     @Test
@@ -108,7 +124,12 @@ class InstructorTest {
 
         assertFalse(instructor.isActive());
         assertEquals(2, events.size());
-        assertInstanceOf(InstructorDeactivated.class, events.get(1));
+        InstructorEvent event = events.get(1);
+        assertInstanceOf(InstructorDeactivated.class, event);
+        InstructorDeactivated deactivatedEvent = (InstructorDeactivated) event;
+        assertEquals(instructorId, deactivatedEvent.instructorId());
+        assertEquals(systemUserId, deactivatedEvent.systemUserId());
+        assertNotNull(deactivatedEvent.deactivationAt());
     }
 
     @Test

@@ -8,7 +8,7 @@ record Specialty(String value) {
             throw new InvalidSpecialityException("Specialty value cannot be null or empty");
         }
         if (value.length() > 100) {
-            throw new InvalidSpecialityException("Specialty value cannot be longer than 50 characters");
+            throw new InvalidSpecialityException("Specialty value cannot be longer than 100 characters");
         }
     }
 }
