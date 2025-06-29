@@ -5,6 +5,8 @@ import com.reservation.instructor.domain.exception.InstructorAlreadyInactiveExce
 import com.reservation.instructor.domain.exception.ProfileCannotBeUpdatedWhenInactiveException;
 import lombok.EqualsAndHashCode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -12,6 +14,7 @@ public class Instructor {
     @EqualsAndHashCode.Include
     private final InstructorId instructorId;
     private final SystemUserId systemUserId;
+    private final List<InstructorEvent> instructorEvents = new ArrayList<>();
     private InstructorProfile profile;
     private InstructorStatus status;
 
@@ -23,7 +26,9 @@ public class Instructor {
     }
 
     public static Instructor create(InstructorId instructorId, SystemUserId systemUserId, InstructorProfile profile) {
-        return new Instructor(instructorId, systemUserId, profile);
+        Instructor instructor = new Instructor(instructorId, systemUserId, profile);
+        instructor.registerEvent(new InstructorCreated(instructorId, systemUserId));
+        return instructor;
     }
 
     public InstructorId getInstructorId() {
@@ -35,10 +40,13 @@ public class Instructor {
     }
 
     public void updateProfile(InstructorProfile profile) {
-        if(!isActive()) {
-            throw new ProfileCannotBeUpdatedWhenInactiveException();
+        if (!isSameProfile(profile)) {
+            if (!isActive()) {
+                throw new ProfileCannotBeUpdatedWhenInactiveException();
+            }
+            this.profile = Objects.requireNonNull(profile);
+            registerEvent(new InstructorUpdated(instructorId, systemUserId));
         }
-        this.profile = Objects.requireNonNull(profile);
     }
 
     public void activate() {
@@ -46,6 +54,7 @@ public class Instructor {
             throw new InstructorAlreadyActiveException();
         }
         this.status = InstructorStatus.ACTIVE;
+        registerEvent(new InstructorActivated(instructorId, systemUserId));
     }
 
     public void deactivate() {
@@ -53,6 +62,17 @@ public class Instructor {
             throw new InstructorAlreadyInactiveException();
         }
         this.status = InstructorStatus.INACTIVE;
+        registerEvent(new InstructorDeactivated(instructorId, systemUserId));
+    }
+
+    public List<InstructorEvent> pullEvents() {
+        List<InstructorEvent> copyEvents = List.copyOf(instructorEvents);
+        instructorEvents.clear();
+        return copyEvents;
+    }
+
+    public void registerEvent(InstructorEvent instructorEvent) {
+        instructorEvents.add(instructorEvent);
     }
 
     public boolean isSameProfile(InstructorProfile profile) {
