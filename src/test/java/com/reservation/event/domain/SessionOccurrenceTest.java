@@ -84,7 +84,7 @@ class SessionOccurrenceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenTryToChangeSessionOccurrenceAlreadyCanceled() {
+    void shouldThrowExceptionWhenTryToCompleteAlreadyCancelledSession() {
         //Given & When
         sessionOccurrence.cancel();
 
