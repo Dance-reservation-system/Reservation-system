@@ -1,6 +1,4 @@
-package com.reservation.event.domain.events;
-
-import com.reservation.event.domain.SessionOccurrenceId;
+package com.reservation.event.domain;
 
 import java.time.Instant;
 

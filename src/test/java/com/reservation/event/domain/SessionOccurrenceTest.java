@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -133,4 +134,58 @@ class SessionOccurrenceTest {
         //Then
         assertFalse(isActive);
     }
+
+    @Test
+    void shouldAddCreateEventToSessionOccurrence() {
+
+        //Given &  When
+        List<SessionOccurrenceEvent> sessionOccurrenceEvents = sessionOccurrence.pullEvents();
+        SessionOccurrenceEvent sessionOccurrenceEvent = sessionOccurrenceEvents.get(0);
+
+        // Then
+        assertAll(
+                () -> assertEquals(1, sessionOccurrenceEvents.size()),
+                () -> {
+                    SessionOccurrenceCreated createdEvent = (SessionOccurrenceCreated) sessionOccurrenceEvent;
+                    assertEquals(sessionOccurrence.getId(), createdEvent.id());
+                }
+        );
+    }
+
+    @Test
+    void shouldCreateCancelEventToSessionOccurrence() {
+        //Given
+        sessionOccurrence.cancel();
+        //When
+        List<SessionOccurrenceEvent> sessionOccurrenceEvents = sessionOccurrence.pullEvents();
+        SessionOccurrenceEvent sessionOccurrenceEvent = sessionOccurrenceEvents.get(1);
+
+        // Then
+        assertAll(
+                () -> assertEquals(2, sessionOccurrenceEvents.size()),
+                () -> {
+                    SessionOccurrenceCancelled createdEvent = (SessionOccurrenceCancelled) sessionOccurrenceEvent;
+                    assertEquals(sessionOccurrence.getId(), createdEvent.id());
+                }
+        );
+    }
+
+    @Test
+    void shouldCreateCompletedEventToSessionOccurrence() {
+        //Given
+        sessionOccurrence.complete();
+        //When
+        List<SessionOccurrenceEvent> sessionOccurrenceEvents = sessionOccurrence.pullEvents();
+        SessionOccurrenceEvent sessionOccurrenceEvent = sessionOccurrenceEvents.get(1);
+
+        // Then
+        assertAll(
+                () -> assertEquals(2, sessionOccurrenceEvents.size()),
+                () -> {
+                    SessionOccurrenceCompleted createdEvent = (SessionOccurrenceCompleted) sessionOccurrenceEvent;
+                    assertEquals(sessionOccurrence.getId(), createdEvent.id());
+                }
+        );
+    }
+
 }
