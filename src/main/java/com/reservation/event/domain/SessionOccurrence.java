@@ -1,6 +1,10 @@
 package com.reservation.event.domain;
 
 import com.reservation.common.AggregateRoot;
+import com.reservation.event.domain.events.SessionOccurrenceCancelled;
+import com.reservation.event.domain.events.SessionOccurrenceCompleted;
+import com.reservation.event.domain.events.SessionOccurrenceCreated;
+import com.reservation.event.domain.events.SessionOccurrenceEvent;
 import com.reservation.event.domain.exception.SessionOccurrenceAlreadyCanceledException;
 import com.reservation.event.domain.exception.SessionOccurrenceNotStartedException;
 import lombok.EqualsAndHashCode;
