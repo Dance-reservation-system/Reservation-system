@@ -1,4 +1,4 @@
 package com.reservation.instructor.domain;
 
-interface InstructorEvent {
+public sealed interface InstructorEvent permits InstructorActivated, InstructorDeactivated, InstructorCreated, InstructorUpdated {
 }

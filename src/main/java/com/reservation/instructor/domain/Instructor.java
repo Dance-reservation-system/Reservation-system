@@ -1,5 +1,6 @@
 package com.reservation.instructor.domain;
 
+import com.reservation.common.AggregateRoot;
 import com.reservation.instructor.domain.exception.InstructorAlreadyActiveException;
 import com.reservation.instructor.domain.exception.InstructorAlreadyInactiveException;
 import com.reservation.instructor.domain.exception.ProfileCannotBeUpdatedWhenInactiveException;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Instructor {
+public class Instructor implements AggregateRoot<InstructorEvent> {
     @EqualsAndHashCode.Include
     private final InstructorId instructorId;
     private final SystemUserId systemUserId;
@@ -65,14 +66,16 @@ public class Instructor {
         registerEvent(new InstructorDeactivated(instructorId, systemUserId));
     }
 
+    @Override
     public List<InstructorEvent> pullEvents() {
         List<InstructorEvent> copyEvents = List.copyOf(instructorEvents);
         instructorEvents.clear();
         return copyEvents;
     }
 
+    @Override
     public void registerEvent(InstructorEvent instructorEvent) {
-        instructorEvents.add(instructorEvent);
+        instructorEvents.add(Objects.requireNonNull(instructorEvent));
     }
 
     public boolean isSameProfile(InstructorProfile profile) {
