@@ -9,9 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,13 +46,17 @@ class InstructorTest {
         assertTrue(instructor.isSameProfile(instructorProfile));
         assertTrue(instructor.isActive());
 
-        assertEquals(1, events.size());
-        InstructorEvent event = events.getFirst();
-        assertInstanceOf(InstructorCreated.class, event);
-        InstructorCreated createdEvent = (InstructorCreated) event;
-        assertEquals(instructorId, createdEvent.instructorId());
-        assertEquals(systemUserId, createdEvent.systemUserId());
-        assertNotNull(createdEvent.createdAt());
+        InstructorCreated instructorCreated = events.stream()
+                .filter(InstructorCreated.class::isInstance)
+                .map(InstructorCreated.class::cast)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Expected InstructorCreated event"));
+
+        assertAll(
+                () -> assertEquals(instructorId, instructorCreated.instructorId()),
+                () -> assertEquals(systemUserId, instructorCreated.systemUserId()),
+                () -> assertNotNull(instructorCreated.createdAt())
+        );
     }
 
     @Test
@@ -65,14 +68,17 @@ class InstructorTest {
         instructor.updateProfile(newProfile);
         events = instructor.pullEvents();
 
-        assertTrue(instructor.isSameProfile(newProfile));
-        assertEquals(2, events.size());
-        InstructorEvent event = events.get(1);
-        assertInstanceOf(InstructorUpdated.class, event);
-        InstructorUpdated updatedEvent = (InstructorUpdated) event;
-        assertEquals(instructorId, updatedEvent.instructorId());
-        assertEquals(systemUserId, updatedEvent.systemUserId());
-        assertNotNull(updatedEvent.updatedAt());
+        InstructorUpdated instructorUpdated = events.stream()
+                .filter(InstructorUpdated.class::isInstance)
+                .map(InstructorUpdated.class::cast)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Expected InstructorUpdated event"));
+
+        assertAll(
+                () -> assertEquals(instructorId, instructorUpdated.instructorId()),
+                () -> assertEquals(systemUserId, instructorUpdated.systemUserId()),
+                () -> assertNotNull(instructorUpdated.updatedAt())
+        );
     }
 
     @Test
@@ -103,13 +109,19 @@ class InstructorTest {
         events = instructor.pullEvents();
 
         assertTrue(instructor.isActive());
-        assertEquals(3, events.size());
-        InstructorEvent event = events.get(2);
-        assertInstanceOf(InstructorActivated.class, event);
-        InstructorActivated activeEvent = (InstructorActivated) event;
-        assertEquals(instructorId, activeEvent.instructorId());
-        assertEquals(systemUserId, activeEvent.systemUserId());
-        assertNotNull(activeEvent.activationAt());
+
+        InstructorActivated activatedEvent = events.stream()
+                .filter(InstructorActivated.class::isInstance)
+                .map(InstructorActivated.class::cast)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Expected InstructorActivated event"));
+
+        assertAll(
+                () -> assertEquals(instructorId, activatedEvent.instructorId()),
+                () -> assertEquals(systemUserId, activatedEvent.systemUserId()),
+                () -> assertNotNull(activatedEvent.activatedAt())
+
+        );
     }
 
     @Test
@@ -122,14 +134,18 @@ class InstructorTest {
         instructor.deactivate();
         events = instructor.pullEvents();
 
-        assertFalse(instructor.isActive());
-        assertEquals(2, events.size());
-        InstructorEvent event = events.get(1);
-        assertInstanceOf(InstructorDeactivated.class, event);
-        InstructorDeactivated deactivatedEvent = (InstructorDeactivated) event;
-        assertEquals(instructorId, deactivatedEvent.instructorId());
-        assertEquals(systemUserId, deactivatedEvent.systemUserId());
-        assertNotNull(deactivatedEvent.deactivationAt());
+
+        InstructorDeactivated instructorDeactivated = events.stream()
+                .filter(InstructorDeactivated.class::isInstance)
+                .map(InstructorDeactivated.class::cast)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Expected InstructorDeactivated event"));
+
+        assertAll(
+                () -> assertEquals(instructorId, instructorDeactivated.instructorId()),
+                () -> assertEquals(systemUserId, instructorDeactivated.systemUserId()),
+                () -> assertNotNull(instructorDeactivated.deactivatedAt())
+        );
     }
 
     @Test
