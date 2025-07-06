@@ -18,11 +18,10 @@ public class Session implements AggregateRoot<SessionEvent> {
     private InstructorId instructorId;
     private HallId hallId;
     private SessionTitle title;
-    //    private EventType type;
     private SessionCapacity capacity;
     private RecurrencePattern recurrence;
     private SessionStatus status;
-    private boolean hasReservation;
+    private boolean reservation;
 
     private final ArrayList<SessionEvent> sessionEvents = new ArrayList<>();
 
@@ -34,7 +33,7 @@ public class Session implements AggregateRoot<SessionEvent> {
         this.capacity = Objects.requireNonNull(capacity);
         this.recurrence = Objects.requireNonNull(recurrence);
         this.status = SessionStatus.SCHEDULED;
-        this.hasReservation = false;
+        this.reservation = false;
     }
 
     public static Session create(SessionId sessionId, InstructorId instructorId, HallId hallId, SessionTitle title, SessionCapacity capacity, RecurrencePattern recurrence) {
@@ -43,8 +42,20 @@ public class Session implements AggregateRoot<SessionEvent> {
         return session;
     }
 
+    public SessionId getSessionId() {
+        return sessionId;
+    }
+
+    public InstructorId getInstructorId() {
+        return instructorId;
+    }
+
+    public HallId getHallId() {
+        return hallId;
+    }
+
     public void updateScheduling(HallId newHallId, SessionCapacity newCapacity, RecurrencePattern newRecurrence) {
-        if(!status.isScheduled()){
+        if (!isScheduled()) {
             throw new SessionUpdatedException();
         }
         this.hallId = Objects.requireNonNull(newHallId);
@@ -54,8 +65,8 @@ public class Session implements AggregateRoot<SessionEvent> {
         registerEvent(new SessionRescheduled(sessionId));
     }
 
-    public void updateMetadata(InstructorId instructorId, SessionTitle newTitle){
-        if(!status.isScheduled()){
+    public void updateMetadata(InstructorId instructorId, SessionTitle newTitle) {
+        if (!isScheduled()) {
             throw new SessionUpdatedException();
         }
         this.instructorId = Objects.requireNonNull(instructorId);
@@ -65,16 +76,20 @@ public class Session implements AggregateRoot<SessionEvent> {
     }
 
     public void cancel() {
-        if(hasReservation){
+        if (hasReservation()) {
             throw new ReservationsExistException();
         }
-        if(!status.isScheduled()){
+        if (!isScheduled()) {
             throw new SessionAlreadyCancelledException();
         }
         this.status = SessionStatus.CANCELLED;
+
+        registerEvent(new SessionCancelled(sessionId));
     }
 
-    // TODO generate Occurrances
+    public List<SessionOccurrenceDraft> generateOccurrenceDrafts() {
+        return recurrence.generateOccurrences(this.sessionId);
+    }
 
     @Override
     public List<SessionEvent> pullEvents() {
@@ -86,5 +101,21 @@ public class Session implements AggregateRoot<SessionEvent> {
     @Override
     public void registerEvent(SessionEvent event) {
         sessionEvents.add(Objects.requireNonNull(event));
+    }
+
+    public boolean hasTitle(SessionTitle title) {
+        return Objects.equals(this.title, title);
+    }
+
+    public boolean hasCapacity(SessionCapacity capacity) {
+        return Objects.equals(this.capacity, capacity);
+    }
+
+    public boolean hasReservation() {
+        return reservation;
+    }
+
+    public boolean isScheduled() {
+        return status.isScheduled();
     }
 }
