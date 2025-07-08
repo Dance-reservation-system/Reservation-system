@@ -2,7 +2,7 @@ package com.reservation.event.domain.sessionoccurrence;
 
 import com.reservation.common.AggregateRoot;
 import com.reservation.event.domain.SessionId;
-import com.reservation.event.domain.sessionoccurrence.exception.SessionOccurrenceAlreadyCanceledException;
+import com.reservation.event.domain.sessionoccurrence.exception.SessionOccurrenceAlreadyCancelledException;
 import com.reservation.event.domain.sessionoccurrence.exception.SessionOccurrenceNotStartedException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -48,8 +48,8 @@ public class SessionOccurrence implements AggregateRoot<SessionOccurrenceEvent> 
 
 
     public void cancel() {
-        if (isCanceled()) {
-            throw new SessionOccurrenceAlreadyCanceledException();
+        if (isCancelled()) {
+            throw new SessionOccurrenceAlreadyCancelledException();
         }
         if (isScheduled()) {
             status = SessionOccurrenceStatus.CANCELLED;
@@ -62,8 +62,8 @@ public class SessionOccurrence implements AggregateRoot<SessionOccurrenceEvent> 
             throw new SessionOccurrenceNotStartedException();
         }
 
-        if (isCanceled()) {
-            throw new SessionOccurrenceAlreadyCanceledException();
+        if (isCancelled()) {
+            throw new SessionOccurrenceAlreadyCancelledException();
         }
 
         if (isScheduled()) {
@@ -76,7 +76,7 @@ public class SessionOccurrence implements AggregateRoot<SessionOccurrenceEvent> 
         return this.status == SessionOccurrenceStatus.SCHEDULED;
     }
 
-    public boolean isCanceled() {
+    public boolean isCancelled() {
         return this.status == SessionOccurrenceStatus.CANCELLED;
     }
 

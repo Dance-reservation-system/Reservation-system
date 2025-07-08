@@ -5,7 +5,6 @@ import com.reservation.event.domain.session.exception.InvalidSessionCapacityExce
 import com.reservation.event.domain.session.exception.InvalidSessionTitleException;
 import com.reservation.event.domain.session.exception.SessionAlreadyCancelledException;
 import com.reservation.event.domain.session.exception.SessionUpdateException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
@@ -24,42 +23,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SessionTest {
 
-    private SessionId sessionId;
-    private InstructorId instructorId;
-    private HallId hallId;
-    private SessionTitle title;
-    private SessionCapacity capacity;
-    private RecurrencePattern recurrencePattern;
-    private Session session;
     private List<SessionEvent> events;
-    private Duration duration;
-
-    @BeforeEach
-    void setUp() {
-        sessionId = SessionId.next();
-        instructorId = InstructorId.next();
-        hallId = HallId.next();
-        title = new SessionTitle("Title");
-        capacity = new SessionCapacity(10);
-
-        duration = Duration.ofHours(1);
-        recurrencePattern = new RecurrencePattern(
-                Set.of(
-                        new RecurrenceSlot(DayOfWeek.MONDAY, LocalTime.of(19, 30)),
-                        new RecurrenceSlot(DayOfWeek.WEDNESDAY, LocalTime.of(20, 30)),
-                        new RecurrenceSlot(DayOfWeek.SATURDAY, LocalTime.of(10, 0))
-                ),
-                duration,
-                LocalDate.of(2025, 1, 1),
-                LocalDate.of(2025, 2, 28),
-                1
-        );
-
-        session = Session.create(sessionId, instructorId, hallId, title, capacity, recurrencePattern);
-    }
 
     @Test
     void shouldCreateSessionWithScheduledStatusAndEvent() {
+        Session session = new SessionTestBuilder().build();
+
         events = session.pullEvents();
 
         SessionCreated createdEvent = events.stream()
@@ -71,7 +40,7 @@ class SessionTest {
         assertAll(
                 () -> assertTrue(session.isScheduled()),
                 () -> assertFalse(session.hasReservation()),
-                () -> assertEquals(sessionId, createdEvent.sessionId()),
+                () -> assertEquals(session.getSessionId(), createdEvent.sessionId()),
                 () -> assertNotNull(createdEvent.createdAt())
         );
     }
@@ -79,7 +48,10 @@ class SessionTest {
     @Test
     void shouldThrowWhenCreatingSessionWithEmptyTitle() {
         assertThrows(InvalidSessionTitleException.class,
-                () -> Session.create(sessionId, instructorId, hallId, new SessionTitle(""), capacity, recurrencePattern));
+                () -> new SessionTestBuilder()
+                        .withTitle("")
+                        .build()
+        );
     }
 
     @Test
@@ -87,20 +59,32 @@ class SessionTest {
         String longTitle = "A".repeat(101);
 
         assertThrows(InvalidSessionTitleException.class,
-                () -> Session.create(sessionId, instructorId, hallId, new SessionTitle(longTitle), capacity, recurrencePattern));
+                () -> new SessionTestBuilder()
+                        .withTitle(longTitle)
+                        .build()
+        );
     }
 
     @Test
     void shouldThrowWhenCreatingSessionWithNegativeCapacity() {
         assertThrows(InvalidSessionCapacityException.class,
-                () -> Session.create(sessionId, instructorId, hallId, title, new SessionCapacity(-5), recurrencePattern));
+                () -> new SessionTestBuilder()
+                        .withCapacity(-5)
+                        .build()
+        );
     }
-
     @Test
     void shouldUpdateSchedulingWhenScheduled() {
+        Session session = new SessionTestBuilder().build();
         HallId newHallId = HallId.next();
         SessionCapacity newCapacity = new SessionCapacity(30);
-        RecurrencePattern newRecurrence = recurrencePattern;
+        RecurrencePattern newRecurrence = new RecurrencePattern(
+                Set.of(new RecurrenceSlot(DayOfWeek.FRIDAY, LocalTime.of(18, 0))),
+                Duration.ofHours(1),
+                LocalDate.of(2025, 3, 1),
+                LocalDate.of(2025, 3, 31),
+                1
+        );
 
         session.updateScheduling(newHallId, newCapacity, newRecurrence);
         events = session.pullEvents();
@@ -114,22 +98,32 @@ class SessionTest {
         assertAll(
                 () -> assertEquals(newHallId, session.getHallId()),
                 () -> assertTrue(session.hasCapacity(newCapacity)),
-                () -> assertEquals(sessionId, rescheduledEvent.sessionId()),
+                () -> assertEquals(session.getSessionId(), rescheduledEvent.sessionId()),
                 () -> assertNotNull(rescheduledEvent.updatedAt())
         );
     }
 
     @Test
     void shouldThrowWhenUpdatingSchedulingWhenCancelled() {
+        Session session = new SessionTestBuilder().build();
         session.cancel();
 
+        RecurrencePattern newRecurrence = new RecurrencePattern(
+                Set.of(new RecurrenceSlot(DayOfWeek.FRIDAY, LocalTime.of(18, 0))),
+                Duration.ofHours(1),
+                LocalDate.of(2025, 3, 1),
+                LocalDate.of(2025, 3, 31),
+                1
+        );
+
         assertThrows(SessionUpdateException.class, () ->
-                session.updateScheduling(HallId.next(), new SessionCapacity(50), recurrencePattern)
+                session.updateScheduling(HallId.next(), new SessionCapacity(50), newRecurrence)
         );
     }
 
     @Test
     void shouldUpdateMetadataWhenScheduled() {
+        Session session = new SessionTestBuilder().build();
         InstructorId newInstructorId = InstructorId.next();
         SessionTitle newTitle = new SessionTitle("Updated Title");
 
@@ -145,13 +139,14 @@ class SessionTest {
         assertAll(
                 () -> assertEquals(newInstructorId, session.getInstructorId()),
                 () -> assertTrue(session.hasTitle(newTitle)),
-                () -> assertEquals(sessionId, updatedMetadataEvent.sessionId()),
+                () -> assertEquals(session.getSessionId(), updatedMetadataEvent.sessionId()),
                 () -> assertNotNull(updatedMetadataEvent.updatedAt())
         );
     }
 
     @Test
     void shouldThrowWhenUpdatingMetadataWhenCancelled() {
+        Session session = new SessionTestBuilder().build();
         session.cancel();
 
         assertThrows(SessionUpdateException.class, () ->
@@ -161,6 +156,8 @@ class SessionTest {
 
     @Test
     void shouldCancelSession() {
+        Session session = new SessionTestBuilder().build();
+
         session.cancel();
         events = session.pullEvents();
 
@@ -172,13 +169,14 @@ class SessionTest {
 
         assertAll(
                 () -> assertFalse(session.isScheduled()),
-                () -> assertEquals(sessionId, cancelledEvent.sessionId()),
+                () -> assertEquals(session.getSessionId(), cancelledEvent.sessionId()),
                 () -> assertNotNull(cancelledEvent.cancelledAt())
         );
     }
 
     @Test
     void shouldThrowWhenCancellingAlreadyCancelledSession() {
+        Session session = new SessionTestBuilder().build();
         session.cancel();
 
         assertThrows(SessionAlreadyCancelledException.class, session::cancel);
@@ -186,17 +184,38 @@ class SessionTest {
 
     @Test
     void shouldGenerateOccurrenceDraftsFromRecurrencePattern() {
+        Duration duration = Duration.ofHours(1);
+        RecurrencePattern pattern = new RecurrencePattern(
+                Set.of(
+                        new RecurrenceSlot(DayOfWeek.MONDAY, LocalTime.of(19, 30)),
+                        new RecurrenceSlot(DayOfWeek.WEDNESDAY, LocalTime.of(20, 30)),
+                        new RecurrenceSlot(DayOfWeek.SATURDAY, LocalTime.of(10, 0))
+                ),
+                duration,
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 2, 28),
+                1
+        );
+
+        Session session = new SessionTestBuilder()
+                .withRecurrencePattern(pattern)
+                .build();
+
         List<SessionOccurrenceDraft> drafts = session.generateOccurrenceDrafts();
 
         assertNotNull(drafts);
+
+        Set<RecurrenceSlot> slots = pattern.recurrenceSlots();
+        SessionId sessionId = session.getSessionId();
 
         for (SessionOccurrenceDraft draft : drafts) {
             DayOfWeek draftDay = draft.startDateTime().getDayOfWeek();
             LocalTime draftTime = draft.startDateTime().toLocalTime();
 
-            boolean matchesSlot = recurrencePattern.recurrenceSlots().stream()
+            boolean matchesSlot = slots.stream()
                     .anyMatch(slot ->
-                            slot.dayOfWeek().equals(draftDay) && slot.time().equals(draftTime)
+                            slot.dayOfWeek().equals(draftDay) &&
+                                    slot.time().equals(draftTime)
                     );
 
             assertAll(
