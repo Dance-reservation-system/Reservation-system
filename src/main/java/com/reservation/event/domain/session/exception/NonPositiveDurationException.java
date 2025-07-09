@@ -7,6 +7,6 @@ public class NonPositiveDurationException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     public NonPositiveDurationException() {
-        super("Duration must be a positive");
+        super("Duration must be positive");
     }
 }
