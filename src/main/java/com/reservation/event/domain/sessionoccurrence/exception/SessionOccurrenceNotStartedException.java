@@ -1,4 +1,4 @@
-package com.reservation.event.domain.exception;
+package com.reservation.event.domain.sessionoccurrence.exception;
 
 import java.io.Serial;
 

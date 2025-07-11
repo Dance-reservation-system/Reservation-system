@@ -1,4 +1,4 @@
-package com.reservation.event.domain;
+package com.reservation.event.domain.sessionoccurrence;
 
 import java.util.Objects;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package com.reservation.event.domain;
+package com.reservation.event.domain.sessionoccurrence;
 
 enum SessionOccurrenceStatus {
     SCHEDULED,
