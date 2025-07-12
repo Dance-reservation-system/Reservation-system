@@ -8,7 +8,7 @@ record ClientId(UUID value) {
         Objects.requireNonNull(value);
     }
 
-    public static ClientId next(){
+    public static ClientId next() {
         return new ClientId(UUID.randomUUID());
     }
 }

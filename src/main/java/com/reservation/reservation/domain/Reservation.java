@@ -14,7 +14,7 @@ public class Reservation implements AggregateRoot<ReservationEvent> {
     private final ClientId clientId;
     private final SessionOccurrenceId sessionOccurrenceId;
     private ReservationStatus reservationStatus;
-    private LocalDateTime reservedAt;
+    private final LocalDateTime reservedAt;
     private LocalDateTime cancelledAt;
 
     private final ArrayList<ReservationEvent> reservationEvents = new ArrayList<>();
@@ -47,7 +47,7 @@ public class Reservation implements AggregateRoot<ReservationEvent> {
 
     public void cancel(LocalDateTime cancelledAt, boolean isCancelLate) {
         if (!isActive()) {
-            throw new ReservationAlreadyCancelledException("Reservation has been cancelled");
+            throw new ReservationAlreadyCancelledException();
         }
         this.cancelledAt = Objects.requireNonNull(cancelledAt);
 
