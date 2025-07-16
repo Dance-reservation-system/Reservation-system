@@ -1,0 +1,46 @@
+services:
+  kamann_keycloak_local:
+    container_name: kamann_keycloak_local
+    build:
+      dockerfile: Dockerfile
+    environment:
+      KC_DB: postgres
+      KC_DB_URL_HOST: kamann_keycloak_db_local
+      KC_DB_URL_DATABASE: keycloak_db
+      KC_DB_USERNAME: keycloak_user
+      KC_DB_PASSWORD: password
+      KC_DB_SCHEMA: public
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: password
+    ports:
+      - "8081:8080"
+    depends_on:
+      kamann_keycloak_db_local:
+        condition: service_healthy
+    networks:
+      - kamann_network
+
+  kamann_keycloak_db_local:
+    container_name: kamann_keycloak_db_local
+    image: postgres:16.3
+    environment:
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: keycloak_user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - kamann_keycloak_db_local_volume:/var/lib/postgresql/data
+    networks:
+      - kamann_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keycloak_user" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  kamann_keycloak_db_local_volume:
+
+networks:
+  kamann_network:

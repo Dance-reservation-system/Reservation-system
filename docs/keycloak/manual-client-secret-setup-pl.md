@@ -10,7 +10,7 @@ Ten poradnik zawiera instrukcję krok po kroku, jak ręcznie wygenerować i skon
 
 Podczas pierwszego uruchomienia instancji Keycloak przy użyciu obecnej konfiguracji projektu (na dzień **18 czerwca 2025**), system inicjalizuje się z predefiniowaną konfiguracją realm. Zawiera ona domyślnie zdefiniowane klienty, role i użytkowników, jednak — ze względu na ograniczenia wprowadzone w Keycloak 25+ — **nie zawiera wartości `client_secret` dla klientów typu confidential**.
 
-Aby uruchomić instancję Keycloak, należy wykonać skrypt `docker-compose-keycloak`, który znajduje się w katalogu `.docker/`.
+Aby uruchomić instancję Keycloak, należy wykonać skrypt `docker-compose-keycloak-local`, który znajduje się w katalogu `.docker/keycloak/`.
 
 Jeśli korzystasz z IntelliJ IDEA, możesz to zrobić wygodnie, klikając jeden przycisk z panelu „Services” lub z poziomu edytora – jak pokazano na poniższym screenie:
 

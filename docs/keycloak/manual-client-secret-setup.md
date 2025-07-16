@@ -10,7 +10,7 @@ This guide provides step-by-step instructions on how to manually generate and co
 
 When starting the Keycloak instance for the first time using the current project configuration (as of **June 18, 2025**), the system initializes with a predefined realm configuration. This includes default clients, roles, and users; however — due to limitations introduced in Keycloak 25+ — **the `client_secret` value for confidential clients is not included**.
 
-To start the Keycloak instance, run the `docker-compose-keycloak` script located in the `.docker/` directory.
+To start the Keycloak instance, run the `docker-compose-keycloak-local` script located in the `.docker/keycloak/` directory.
 
 If you use IntelliJ IDEA, you can conveniently do this by clicking a single button from the “Services” panel or from the editor, as shown in the screenshot below:
 
