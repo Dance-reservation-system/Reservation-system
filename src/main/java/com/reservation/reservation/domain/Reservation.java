@@ -3,7 +3,6 @@ package com.reservation.reservation.domain;
 import com.reservation.common.AggregateRoot;
 import com.reservation.reservation.domain.exception.ReservationAlreadyCancelledException;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +13,12 @@ public class Reservation implements AggregateRoot<ReservationEvent> {
     private final ClientId clientId;
     private final SessionOccurrenceId sessionOccurrenceId;
     private ReservationStatus reservationStatus;
-    private final LocalDateTime reservedAt;
-    private LocalDateTime cancelledAt;
+    private final ReservationTime reservedAt;
+    private CancellationTime cancelledAt;
 
     private final ArrayList<ReservationEvent> reservationEvents = new ArrayList<>();
 
-    private Reservation(ReservationId reservationId, ClientId clientId, SessionOccurrenceId sessionOccurrenceId, LocalDateTime reservedAt) {
+    private Reservation(ReservationId reservationId, ClientId clientId, SessionOccurrenceId sessionOccurrenceId, ReservationTime reservedAt) {
         this.reservationId = Objects.requireNonNull(reservationId);
         this.clientId = Objects.requireNonNull(clientId);
         this.sessionOccurrenceId = Objects.requireNonNull(sessionOccurrenceId);
@@ -27,9 +26,9 @@ public class Reservation implements AggregateRoot<ReservationEvent> {
         this.reservationStatus = ReservationStatus.ACTIVE;
     }
 
-    public static Reservation create(ReservationId reservationId, ClientId clientId, SessionOccurrenceId sessionOccurrenceId, LocalDateTime reservedAt) {
+    public static Reservation create(ReservationId reservationId, ClientId clientId, SessionOccurrenceId sessionOccurrenceId, ReservationTime reservedAt) {
         Reservation reservation = new Reservation(reservationId, clientId, sessionOccurrenceId, reservedAt);
-        reservation.registerEvent(new ReservationCreated(reservationId));
+        reservation.registerEvent(new ReservationCreated(reservationId, clientId, sessionOccurrenceId, reservedAt));
         return reservation;
     }
 
@@ -41,31 +40,24 @@ public class Reservation implements AggregateRoot<ReservationEvent> {
         return this.clientId;
     }
 
-    public SessionOccurrenceId getSessionOccurrenceId() {
-        return this.sessionOccurrenceId;
-    }
-
-    public void cancel(LocalDateTime cancelledAt, boolean isCancelLate) {
+    public void cancel(CancellationTime cancelledAt, CancellationPolicy cancellationPolicy) {
         if (!isActive()) {
             throw new ReservationAlreadyCancelledException();
         }
         this.cancelledAt = Objects.requireNonNull(cancelledAt);
+        Objects.requireNonNull(cancellationPolicy);
 
-        this.reservationStatus = isCancelLate
-                ? ReservationStatus.CANCELLED_LATE
-                : ReservationStatus.CANCELLED_EARLY;
+        this.reservationStatus = cancellationPolicy.isLate(reservedAt, cancelledAt) ? ReservationStatus.CANCELLED_LATE : ReservationStatus.CANCELLED_EARLY;
 
-        registerEvent(new ReservationCancelled(reservationId, this.reservationStatus));
+        registerEvent(new ReservationCancelled(reservationId, clientId, sessionOccurrenceId, this.reservationStatus, cancelledAt, reservedAt));
     }
 
-    public boolean isCancellableAt(LocalDateTime now, Duration cancellationWindow) {
-        Objects.requireNonNull(now);
-        Objects.requireNonNull(cancellationWindow);
-        return isActive() && now.isBefore(reservedAt.minus(cancellationWindow));
+    public boolean isCancellableAt(ReservationTime now, CancellationPolicy policy) {
+        return isActive() && policy.isCancellableAt(reservedAt, now);
     }
 
-    public boolean wasCancelledBefore(LocalDateTime now) {
-        return cancelledAt != null && cancelledAt.isBefore(now);
+    public boolean wasCancelledBefore(LocalDateTime now, CancellationPolicy policy) {
+        return policy.wasCancelledBefore(cancelledAt, now);
     }
 
     @Override

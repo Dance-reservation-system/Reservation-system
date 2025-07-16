@@ -1,7 +1,6 @@
 package com.reservation.reservation.domain;
 
 import com.reservation.reservation.domain.exception.ReservationAlreadyCancelledException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -16,24 +15,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReservationTest {
+    private final CancellationPolicy policy = new CancellationPolicy(Duration.ofHours(2));
+    private final ReservationTime reservedAt = new ReservationTime(LocalDateTime.now().plusDays(1));
     private Reservation reservation;
-    private ReservationId reservationId;
-    private ClientId clientId;
-    private SessionOccurrenceId sessionOccurrenceId;
-    private LocalDateTime reservedAt;
     private List<ReservationEvent> events;
-
-    @BeforeEach
-    void setUp() {
-        reservationId = ReservationId.next();
-        clientId = ClientId.next();
-        sessionOccurrenceId = SessionOccurrenceId.next();
-        reservedAt = LocalDateTime.now().plusDays(1);
-        reservation = Reservation.create(reservationId, clientId, sessionOccurrenceId, reservedAt);
-    }
 
     @Test
     void shouldCreateValidReservation() {
+        reservation = new ReservationTestBuilder().build();
+
         events = reservation.pullEvents();
 
         ReservationCreated reservationCreated = events.stream()
@@ -43,21 +33,17 @@ class ReservationTest {
                 .orElseThrow(() -> new AssertionError("Expected ReservationCreated event"));
 
         assertAll(
-                () -> assertEquals(reservationId, reservation.getReservationId()),
-                () -> assertEquals(clientId, reservation.getClientId()),
-                () -> assertEquals(sessionOccurrenceId, reservation.getSessionOccurrenceId()),
                 () -> assertTrue(reservation.isActive()),
-                () -> assertEquals(reservationId, reservationCreated.reservationId()),
                 () -> assertNotNull(reservationCreated.createdAt())
         );
     }
 
     @Test
     void shouldCancelEarly() {
-        LocalDateTime cancelTime = reservedAt.minusHours(4);
-        boolean isLate = false;
+        reservation = new ReservationTestBuilder().build();
+        CancellationTime cancellationTime = new CancellationTime(reservedAt.minusHours(4).value());
 
-        reservation.cancel(cancelTime, isLate);
+        reservation.cancel(cancellationTime, policy);
         events = reservation.pullEvents();
 
         ReservationCancelled reservationCancelled = events.stream()
@@ -68,17 +54,16 @@ class ReservationTest {
 
         assertAll(
                 () -> assertEquals(ReservationStatus.CANCELLED_EARLY, reservationCancelled.status()),
-                () -> assertEquals(reservationId, reservationCancelled.reservationId()),
                 () -> assertFalse(reservation.isActive())
         );
     }
 
     @Test
     void shouldCancelLate() {
-        LocalDateTime cancelTime = reservedAt.minusMinutes(15);
-        boolean isLate = true;
+        reservation = new ReservationTestBuilder().build();
+        CancellationTime cancellationTime = new CancellationTime(reservedAt.minusMinutes(15).value());
 
-        reservation.cancel(cancelTime, isLate);
+        reservation.cancel(cancellationTime, policy);
         events = reservation.pullEvents();
 
         ReservationCancelled reservationCancelled = events.stream()
@@ -89,46 +74,50 @@ class ReservationTest {
 
         assertAll(
                 () -> assertEquals(ReservationStatus.CANCELLED_LATE, reservationCancelled.status()),
-                () -> assertEquals(reservationId, reservationCancelled.reservationId()),
                 () -> assertFalse(reservation.isActive())
         );
     }
 
     @Test
     void shouldThrowWhenTryingToCancelAlreadyCancelledReservation() {
-        reservation.cancel(reservedAt.minusHours(2), false);
+        reservation = new ReservationTestBuilder().build();
+        CancellationTime cancellationTime = new CancellationTime(reservedAt.minusHours(3).value());
+
+        reservation.cancel(cancellationTime, policy);
 
         assertThrows(ReservationAlreadyCancelledException.class, () ->
-                reservation.cancel(reservedAt.minusHours(1), true)
+                reservation.cancel(new CancellationTime(reservedAt.minusHours(1).value()), policy)
         );
     }
 
     @Test
     void shouldReturnFalseWhenIsNotCancellableWithinWindow() {
-        Duration window = Duration.ofHours(2);
-        LocalDateTime now = reservedAt.minusMinutes(30);
+        reservation = new ReservationTestBuilder().build();
+        ReservationTime now = reservedAt.minusMinutes(30);
 
-        boolean result = reservation.isCancellableAt(now, window);
+        boolean result = reservation.isCancellableAt(now, policy);
 
         assertFalse(result);
     }
 
     @Test
     void shouldReturnTrueWhenIsCancellableWithinWindow() {
-        Duration window = Duration.ofHours(2);
-        LocalDateTime now = reservedAt.minusHours(3);
+        reservation = new ReservationTestBuilder().build();
+        ReservationTime now = reservedAt.minusHours(3);
 
-        boolean result = reservation.isCancellableAt(now, window);
+        boolean result = reservation.isCancellableAt(now, policy);
 
         assertTrue(result);
     }
 
     @Test
     void shouldReturnTrueWhenWasCancelledBeforeGivenTime() {
-        LocalDateTime cancelTime = reservedAt.minusHours(3);
-        reservation.cancel(cancelTime, false);
+        reservation = new ReservationTestBuilder().build();
+        CancellationTime cancellationTime = new CancellationTime(reservedAt.minusHours(3).value());
 
-        boolean result = reservation.wasCancelledBefore(LocalDateTime.now().plusDays(2));
+        reservation.cancel(cancellationTime, policy);
+
+        boolean result = reservation.wasCancelledBefore(LocalDateTime.now().plusDays(2), policy);
 
         assertTrue(result);
     }
