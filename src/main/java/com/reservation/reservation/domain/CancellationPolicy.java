@@ -3,6 +3,7 @@ package com.reservation.reservation.domain;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 public class CancellationPolicy {
 
@@ -20,7 +21,7 @@ public class CancellationPolicy {
         return now.value().isBefore(reservedAt.value().minus(earlyCancellationThreshold));
     }
 
-    public boolean wasCancelledBefore(CancellationTime cancelledAt, LocalDateTime pointInTime) {
-        return cancelledAt != null && cancelledAt.value().isBefore(pointInTime);
+    public boolean wasCancelledBefore(Optional<CancellationTime> cancelledAt, LocalDateTime pointInTime) {
+        return cancelledAt.map(c -> c.value().isBefore(pointInTime)).orElse(false);
     }
 }

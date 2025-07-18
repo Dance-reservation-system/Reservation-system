@@ -15,8 +15,4 @@ record ReservationTime(LocalDateTime value) {
     public ReservationTime minusMinutes(long minutes) {
         return new ReservationTime(value.minusMinutes(minutes));
     }
-
-    public LocalDateTime value() {
-        return value;
-    }
 }

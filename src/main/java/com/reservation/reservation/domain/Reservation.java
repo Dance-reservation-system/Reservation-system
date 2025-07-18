@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Reservation implements AggregateRoot<ReservationEvent> {
     private final ReservationId reservationId;
@@ -57,7 +58,7 @@ public class Reservation implements AggregateRoot<ReservationEvent> {
     }
 
     public boolean wasCancelledBefore(LocalDateTime now, CancellationPolicy policy) {
-        return policy.wasCancelledBefore(cancelledAt, now);
+        return policy.wasCancelledBefore(Optional.ofNullable(cancelledAt), now);
     }
 
     @Override
