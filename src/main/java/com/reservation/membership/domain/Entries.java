@@ -1,6 +1,7 @@
 package com.reservation.membership.domain;
 
 import com.reservation.membership.domain.exception.InvalidEntriesCountException;
+import com.reservation.membership.domain.exception.NoRemainingEntriesException;
 
 record Entries(EntryType type, int remaining) {
     public Entries {
@@ -10,6 +11,9 @@ record Entries(EntryType type, int remaining) {
     }
 
     public Entries useEntry() {
+        if(hasEntries()){
+            throw new NoRemainingEntriesException();
+        }
         return new Entries(type, remaining - 1);
     }
 

@@ -78,6 +78,16 @@ class MembershipCardTest {
         assertEquals(today.plusDays(30), card.getExpirationDate());
     }
 
+    @Test
+    void shouldBeValidExactlyOnExpirationDate() {
+        MembershipCard card = new MembershipCardTestBuilder().build();
+        card.useEntry(today);
+
+        LocalDate expirationDate = today.plusDays(30);
+
+        assertTrue(card.isValidAt(expirationDate));
+    }
+
     private <T> T findEvent(List<MembershipCardEvent> events, Class<T> clazz) {
         return events.stream()
                 .filter(clazz::isInstance)

@@ -2,6 +2,7 @@ package com.reservation.membership.domain;
 
 import com.reservation.common.AggregateRoot;
 import com.reservation.membership.domain.exception.MembershipCardNotValidException;
+import com.reservation.membership.domain.exception.NoRemainingEntriesException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -40,6 +41,9 @@ public class MembershipCard implements AggregateRoot<MembershipCardEvent> {
     }
 
     public void useEntry(LocalDate date) {
+        if(!entries.hasEntries()){
+            throw new NoRemainingEntriesException();
+        }
         if (firstUseDate == null) {
             firstUseDate = date;
             registerEvent(new MembershipCardFirstUsed(membershipCardId, firstUseDate));
@@ -61,8 +65,8 @@ public class MembershipCard implements AggregateRoot<MembershipCardEvent> {
 
     @Override
     public List<MembershipCardEvent> pullEvents() {
-        List<MembershipCardEvent> copyEvents = new ArrayList<>(this.membershipCardEvents);
-        this.membershipCardEvents.clear();
+        List<MembershipCardEvent> copyEvents = List.copyOf(membershipCardEvents);
+        membershipCardEvents.clear();
         return copyEvents;
     }
 
