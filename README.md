@@ -9,7 +9,7 @@ A modern reservation system **engineered with Domain-Driven Design (DDD) and Cle
 [![Open PRs](https://img.shields.io/github/issues-pr/Dance-reservation-system/Reservation-system?style=flat-square&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/pulls)
 
 [![BE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Reservation-system?style=flat-square&color=green&label=BE%20Contributors&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/graphs/contributors)
-[![FE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Kamann-web?style=flat-square&color=blue&label=FE%20Contributors&logo=github)](https://github.com/Dance-reservation-system/Kamann-web/graphs/contributors)
+[![FE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/reservation-system-web?style=flat-square&color=blue&label=FE%20Contributors&logo=github)](https://github.com/Dance-reservation-system/reservation-system-web/graphs/contributors)
 
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Dance-reservation-system_Kamann-modular&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Dance-reservation-system_Kamann-modular)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Dance-reservation-system_Kamann-modular&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Dance-reservation-system_Kamann-modular)
