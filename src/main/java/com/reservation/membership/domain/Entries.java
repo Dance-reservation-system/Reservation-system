@@ -11,14 +11,14 @@ record Entries(EntryType type, int remaining) {
     }
 
     public Entries useEntry() {
-        if(hasEntries()){
+        if (noRemainingEntries()) {
             throw new NoRemainingEntriesException();
         }
         return new Entries(type, remaining - 1);
     }
 
-    public boolean hasEntries() {
-        return remaining > 0;
+    public boolean noRemainingEntries() {
+        return remaining == 0;
     }
 
     public int getMaxEntries() {
