@@ -104,7 +104,7 @@ public class Payment implements AggregateRoot<PaymentEvent> {
 
     @Override
     public void registerEvent(PaymentEvent event) {
-        this.events.add(event);
+       events.add(event);
     }
 
     @Override
