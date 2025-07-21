@@ -1,6 +1,7 @@
 package com.reservation.membership.domain;
 
 import com.reservation.common.AggregateRoot;
+import com.reservation.membership.domain.exception.InvalidValidityDaysException;
 import com.reservation.membership.domain.exception.MembershipCardNotValidException;
 import com.reservation.membership.domain.exception.NoRemainingEntriesException;
 
@@ -21,6 +22,9 @@ public class MembershipCard implements AggregateRoot<MembershipCardEvent> {
     private MembershipCard(MembershipCardId membershipCardId, ClientId clientId, EntryType entryType, int validityDays) {
         this.membershipCardId = Objects.requireNonNull(membershipCardId);
         this.clientId = Objects.requireNonNull(clientId);
+        if (validityDays <= 0) {
+            throw new InvalidValidityDaysException();
+        }
         this.validityDays = validityDays;
         Objects.requireNonNull(entryType);
         this.entries = new Entries(entryType, entryType.getValue());
