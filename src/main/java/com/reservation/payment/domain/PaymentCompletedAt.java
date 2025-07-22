@@ -5,7 +5,7 @@ import com.reservation.payment.domain.exception.InvalidPaymentCompletionTimeExce
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public record PaymentCompletedAt(LocalDateTime value) {
+record PaymentCompletedAt(LocalDateTime value) {
 
     public PaymentCompletedAt {
         Objects.requireNonNull(value, "Payment completion time must not be null");

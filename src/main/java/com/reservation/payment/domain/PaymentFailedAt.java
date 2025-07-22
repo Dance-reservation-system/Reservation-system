@@ -5,7 +5,7 @@ import com.reservation.payment.domain.exception.InvalidPaymentFailureTimeExcepti
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public record PaymentFailedAt(LocalDateTime value) {
+record PaymentFailedAt(LocalDateTime value) {
 
     public PaymentFailedAt {
         Objects.requireNonNull(value, "Failure time must not be null");

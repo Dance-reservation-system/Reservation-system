@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Payment implements AggregateRoot<PaymentEvent> {
+class Payment implements AggregateRoot<PaymentEvent> {
 
     private final PaymentId paymentId;
     private final ReservationId reservationId;
@@ -32,31 +32,31 @@ public class Payment implements AggregateRoot<PaymentEvent> {
         this.status = PaymentStatus.INITIATED;
     }
 
-    public static Payment create(PaymentId id, ReservationId reservationId, Money amount,
+    static Payment create(PaymentId id, ReservationId reservationId, Money amount,
                                    PaymentMethod method, PaymentInitiatedAt initiatedAt) {
         return new Payment(id, reservationId, amount, method, initiatedAt);
     }
 
-    public PaymentId getPaymentId() {
+    PaymentId getPaymentId() {
         return paymentId;
     }
 
-    public ReservationId getReservationId() {
+    ReservationId getReservationId() {
         return reservationId;
     }
 
-    public boolean hasSameReservation(ReservationId id) {
+    boolean hasSameReservation(ReservationId id) {
         return this.reservationId.equals(id);
     }
 
-    public void markAsCompleted(PaymentCompletedAt completedAt) {
+    void markAsCompleted(PaymentCompletedAt completedAt) {
         requireNotCompletedOrFailed();
         this.completedAt = Objects.requireNonNull(completedAt);
         this.status = PaymentStatus.COMPLETED;
         registerEvent(new PaymentCompletedEvent(paymentId, reservationId, completedAt));
     }
 
-    public void markAsFailed(PaymentFailedAt failedAt, FailureReason reason) {
+    void markAsFailed(PaymentFailedAt failedAt, FailureReason reason) {
         requireNotCompletedOrFailed();
         this.failedAt = Objects.requireNonNull(failedAt);
         this.failureReason = Objects.requireNonNull(reason);
@@ -85,7 +85,7 @@ public class Payment implements AggregateRoot<PaymentEvent> {
         return status == PaymentStatus.INITIATED;
     }
 
-    public PaymentSnapshot describeSnapshot() {
+    PaymentSnapshot describeSnapshot() {
         return new PaymentSnapshot(
                 paymentId,
                 reservationId,
