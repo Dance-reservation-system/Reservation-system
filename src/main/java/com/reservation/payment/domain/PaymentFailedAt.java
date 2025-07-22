@@ -7,7 +7,7 @@ import java.util.Objects;
 
 record PaymentFailedAt(LocalDateTime value) {
 
-    public PaymentFailedAt {
+    PaymentFailedAt {
         Objects.requireNonNull(value, "Failure time must not be null");
 
         if (value.isAfter(LocalDateTime.now())) {
@@ -15,7 +15,7 @@ record PaymentFailedAt(LocalDateTime value) {
         }
     }
 
-    public static PaymentFailedAt now() {
+    static PaymentFailedAt now() {
         return new PaymentFailedAt(LocalDateTime.now());
     }
 }

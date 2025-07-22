@@ -7,18 +7,18 @@ import java.util.Objects;
 
 record PaymentInitiatedAt(LocalDateTime value) {
 
-    public PaymentInitiatedAt {
+    PaymentInitiatedAt {
         Objects.requireNonNull(value, "Payment initiation time must not be null");
         if (value.isAfter(LocalDateTime.now())) {
             throw new InvalidPaymentInitiationTimeException(value);
         }
     }
 
-    public boolean isBefore(PaymentInitiatedAt other) {
+    boolean isBefore(PaymentInitiatedAt other) {
         return value.isBefore(other.value());
     }
 
-    public static PaymentInitiatedAt now() {
+    static PaymentInitiatedAt now() {
         return new PaymentInitiatedAt(LocalDateTime.now());
     }
 }

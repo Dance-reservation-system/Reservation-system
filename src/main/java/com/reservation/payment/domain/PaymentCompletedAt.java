@@ -7,14 +7,14 @@ import java.util.Objects;
 
 record PaymentCompletedAt(LocalDateTime value) {
 
-    public PaymentCompletedAt {
+    PaymentCompletedAt {
         Objects.requireNonNull(value, "Payment completion time must not be null");
         if (value.isAfter(LocalDateTime.now())) {
             throw new InvalidPaymentCompletionTimeException(LocalDateTime.now());
         }
     }
 
-    public static PaymentCompletedAt now() {
+    static PaymentCompletedAt now() {
         return new PaymentCompletedAt(LocalDateTime.now());
     }
 }

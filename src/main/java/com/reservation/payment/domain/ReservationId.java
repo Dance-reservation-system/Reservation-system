@@ -8,7 +8,7 @@ record ReservationId(UUID value) {
         Objects.requireNonNull(value);
     }
 
-    public static ReservationId next() {
+    static ReservationId next() {
         return new ReservationId(UUID.randomUUID());
     }
 }

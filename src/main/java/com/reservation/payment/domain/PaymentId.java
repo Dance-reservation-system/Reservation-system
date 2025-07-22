@@ -4,11 +4,11 @@ import java.util.Objects;
 import java.util.UUID;
 
 record PaymentId(UUID value) {
-    public PaymentId {
+    PaymentId {
         Objects.requireNonNull(value);
     }
 
-    public static PaymentId next() {
+    static PaymentId next() {
         return new PaymentId(UUID.randomUUID());
     }
 }
