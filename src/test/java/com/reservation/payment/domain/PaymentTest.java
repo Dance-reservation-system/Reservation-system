@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Currency;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PaymentTest {
+
+    private static final LocalDateTime BASE_TIME = LocalDateTime.now().minusSeconds(1);
+    private static final Currency PLN = Currency.getInstance("PLN");
 
     @Test
     void shouldCreatePaymentCorrectly() {
@@ -23,7 +23,8 @@ class PaymentTest {
 
         assertAll(
                 () -> assertEquals(PaymentStatus.INITIATED, snapshot.status()),
-                () -> assertEquals(BigDecimal.valueOf(50), snapshot.amount().value()),
+                () -> assertEquals(BigDecimal.valueOf(50), snapshot.amount().amount()),
+                () -> assertEquals(PLN, snapshot.amount().currency()),
                 () -> assertNotNull(snapshot.initiatedAt())
         );
     }
@@ -31,7 +32,7 @@ class PaymentTest {
     @Test
     void shouldMarkPaymentAsCompleted() {
         Payment payment = new PaymentTestBuilder().build();
-        PaymentCompletedAt completedAt = new PaymentCompletedAt(LocalDateTime.now());
+        PaymentCompletedAt completedAt = new PaymentCompletedAt(BASE_TIME);
 
         payment.markAsCompleted(completedAt);
         PaymentSnapshot snapshot = payment.describeSnapshot();
@@ -45,7 +46,7 @@ class PaymentTest {
     @Test
     void shouldMarkPaymentAsFailed() {
         Payment payment = new PaymentTestBuilder().build();
-        PaymentFailedAt failedAt = new PaymentFailedAt(LocalDateTime.now());
+        PaymentFailedAt failedAt = new PaymentFailedAt(BASE_TIME);
         FailureReason reason = new FailureReason("Insufficient funds");
 
         payment.markAsFailed(failedAt, reason);
@@ -61,8 +62,8 @@ class PaymentTest {
     @Test
     void shouldNotAllowCompletingAnAlreadyCompletedPayment() {
         Payment payment = new PaymentTestBuilder().build();
-        PaymentCompletedAt completedAt1 = new PaymentCompletedAt(LocalDateTime.now());
-        PaymentCompletedAt completedAt2 = new PaymentCompletedAt(LocalDateTime.now().plusSeconds(1));
+        PaymentCompletedAt completedAt1 = new PaymentCompletedAt(BASE_TIME);
+        PaymentCompletedAt completedAt2 = new PaymentCompletedAt(BASE_TIME.plusSeconds(1));
 
         payment.markAsCompleted(completedAt1);
 
@@ -73,10 +74,10 @@ class PaymentTest {
     @Test
     void shouldNotAllowFailingAnAlreadyFailedPayment() {
         Payment payment = new PaymentTestBuilder().build();
-        PaymentFailedAt failedAt1 = new PaymentFailedAt(LocalDateTime.now());
+        PaymentFailedAt failedAt1 = new PaymentFailedAt(BASE_TIME);
         FailureReason reason1 = new FailureReason("fail");
 
-        PaymentFailedAt failedAt2 = new PaymentFailedAt(LocalDateTime.now().plusSeconds(1));
+        PaymentFailedAt failedAt2 = new PaymentFailedAt(BASE_TIME.plusSeconds(1));
         FailureReason reason2 = new FailureReason("again");
 
         payment.markAsFailed(failedAt1, reason1);
@@ -88,8 +89,8 @@ class PaymentTest {
     @Test
     void shouldNotAllowFailingAfterCompletion() {
         Payment payment = new PaymentTestBuilder().build();
-        PaymentCompletedAt completedAt = new PaymentCompletedAt(LocalDateTime.now());
-        PaymentFailedAt failedAt = new PaymentFailedAt(LocalDateTime.now().plusSeconds(1));
+        PaymentCompletedAt completedAt = new PaymentCompletedAt(BASE_TIME);
+        PaymentFailedAt failedAt = new PaymentFailedAt(BASE_TIME.plusSeconds(1));
         FailureReason reason = new FailureReason("too late");
 
         payment.markAsCompleted(completedAt);
@@ -101,10 +102,10 @@ class PaymentTest {
     @Test
     void shouldNotAllowCompletingAfterFailure() {
         Payment payment = new PaymentTestBuilder().build();
-        PaymentFailedAt failedAt = new PaymentFailedAt(LocalDateTime.now());
+        PaymentFailedAt failedAt = new PaymentFailedAt(BASE_TIME);
         FailureReason reason = new FailureReason("too early");
 
-        PaymentCompletedAt completedAt = new PaymentCompletedAt(LocalDateTime.now().plusSeconds(1));
+        PaymentCompletedAt completedAt = new PaymentCompletedAt(BASE_TIME.plusSeconds(1));
 
         payment.markAsFailed(failedAt, reason);
 
@@ -112,15 +113,14 @@ class PaymentTest {
                 () -> payment.markAsCompleted(completedAt));
     }
 
-
     @Test
     void shouldRegisterCompletedEvent() {
         Payment payment = new PaymentTestBuilder().build();
-        PaymentCompletedAt completedAt = new PaymentCompletedAt(LocalDateTime.now());
+        PaymentCompletedAt completedAt = new PaymentCompletedAt(BASE_TIME);
 
         payment.markAsCompleted(completedAt);
 
-        var events = payment.pullEvents();
+        List<PaymentEvent> events = payment.pullEvents();
         assertEquals(1, events.size());
         assertInstanceOf(PaymentCompletedEvent.class, events.getFirst());
 
@@ -133,16 +133,16 @@ class PaymentTest {
     @Test
     void shouldRegisterFailedEvent() {
         Payment payment = new PaymentTestBuilder().build();
-        PaymentFailedAt failedAt = new PaymentFailedAt(LocalDateTime.now());
+        PaymentFailedAt failedAt = new PaymentFailedAt(BASE_TIME);
         FailureReason reason = new FailureReason("Too late");
 
         payment.markAsFailed(failedAt, reason);
 
-        var events = payment.pullEvents();
+        List<PaymentEvent> events = payment.pullEvents();
         assertEquals(1, events.size());
-        assertTrue(events.get(0) instanceof PaymentFailedEvent);
+        assertInstanceOf(PaymentFailedEvent.class, events.getFirst());
 
-        PaymentFailedEvent event = (PaymentFailedEvent) events.get(0);
+        PaymentFailedEvent event = (PaymentFailedEvent) events.getFirst();
         assertEquals(reason, event.reason());
         assertEquals(failedAt, event.failedAt());
     }
@@ -150,7 +150,7 @@ class PaymentTest {
     @Test
     void shouldReturnEmptyEventListIfNoEventsRegistered() {
         Payment payment = new PaymentTestBuilder().build();
-        var events = payment.pullEvents();
+        List<PaymentEvent> events = payment.pullEvents();
 
         assertTrue(events.isEmpty());
     }

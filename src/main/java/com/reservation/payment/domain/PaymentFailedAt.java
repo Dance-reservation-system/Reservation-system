@@ -1,10 +1,21 @@
 package com.reservation.payment.domain;
 
+import com.reservation.payment.domain.exception.InvalidPaymentFailureTimeException;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-record PaymentFailedAt(LocalDateTime value) {
+public record PaymentFailedAt(LocalDateTime value) {
+
     public PaymentFailedAt {
-        Objects.requireNonNull(value, "failedAt must not be null");
+        Objects.requireNonNull(value, "Failure time must not be null");
+
+        if (value.isAfter(LocalDateTime.now())) {
+            throw new InvalidPaymentFailureTimeException(value);
+        }
+    }
+
+    public static PaymentFailedAt now() {
+        return new PaymentFailedAt(LocalDateTime.now());
     }
 }

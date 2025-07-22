@@ -1,4 +1,4 @@
 package com.reservation.payment.domain;
 
-sealed interface PaymentEvent permits PaymentCompletedEvent, PaymentFailedEvent {
+public sealed interface PaymentEvent permits PaymentCompletedEvent, PaymentFailedEvent {
 }

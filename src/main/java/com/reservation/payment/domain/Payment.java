@@ -3,16 +3,13 @@ package com.reservation.payment.domain;
 import com.reservation.common.AggregateRoot;
 import com.reservation.payment.domain.exception.PaymentAlreadyCompletedException;
 import com.reservation.payment.domain.exception.PaymentAlreadyFailedException;
-import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Payment implements AggregateRoot<PaymentEvent> {
 
-    @EqualsAndHashCode.Include
     private final PaymentId paymentId;
     private final ReservationId reservationId;
     private final Money amount;
@@ -112,5 +109,17 @@ public class Payment implements AggregateRoot<PaymentEvent> {
         List<PaymentEvent> copy = List.copyOf(events);
         this.events.clear();
         return copy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Payment other)) return false;
+        return Objects.equals(paymentId, other.paymentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(paymentId);
     }
 }
