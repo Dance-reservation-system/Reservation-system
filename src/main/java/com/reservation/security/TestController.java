@@ -19,6 +19,7 @@ public class TestController {
 
     @GetMapping("/test")
     public String token() {
+        System.out.println("Testing token");
         return tokenProvider.getAccessToken();
     }
 }

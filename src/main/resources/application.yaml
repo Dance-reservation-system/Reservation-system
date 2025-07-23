@@ -3,7 +3,7 @@ spring:
     name: Reservation-system
 
   profiles:
-    default: local
+    active: dev
 
   flyway:
     enabled: true
