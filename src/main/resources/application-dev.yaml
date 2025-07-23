@@ -40,7 +40,7 @@ spring:
           jwk-set-uri: ${KEYCLOAK_OAUTH2_JWT_SET_URI}
           user-info-uri: ${KEYCLOAK_OAUTH2_USER_INFO_URI}
 
-#logging:
-#  level:
-#    root: DEBUG
-#    org.springframework: DEBUG
+logging:
+  level:
+    root: DEBUG
+    org.springframework: DEBUG
