@@ -9,7 +9,8 @@ record PaymentInitiatedAt(LocalDateTime value) {
 
     PaymentInitiatedAt {
         Objects.requireNonNull(value, "Payment initiation time must not be null");
-        if (value.isAfter(LocalDateTime.now())) {
+        LocalDateTime now = LocalDateTime.now();
+        if (value.isAfter(now)) {
             throw new InvalidPaymentInitiationTimeException(value);
         }
     }

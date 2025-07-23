@@ -28,12 +28,12 @@ public record Money(BigDecimal amount, Currency currency) {
 
     Money add(Money other) {
         requireSameCurrency(other);
-        return new Money(this.amount.add(other.amount), currency);
+        return new Money(amount.add(other.amount), currency);
     }
 
     Money subtract(Money other) {
         requireSameCurrency(other);
-        BigDecimal result = this.amount.subtract(other.amount);
+        BigDecimal result = amount.subtract(other.amount);
         if (result.compareTo(BigDecimal.ZERO) < 0) {
             throw new InvalidMoneyAmountException(result);
         }
@@ -42,7 +42,7 @@ public record Money(BigDecimal amount, Currency currency) {
 
     boolean isGreaterThan(Money other) {
         requireSameCurrency(other);
-        return this.amount.compareTo(other.amount) > 0;
+        return amount.compareTo(other.amount) > 0;
     }
 
     boolean isZero() {
@@ -50,7 +50,7 @@ public record Money(BigDecimal amount, Currency currency) {
     }
 
     private void requireSameCurrency(Money other) {
-        if (!this.currency.equals(other.currency)) {
+        if (!currency.equals(other.currency)) {
             throw new CurrencyMismatchException(currency, other.currency());
         }
     }

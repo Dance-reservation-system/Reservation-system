@@ -1,12 +1,14 @@
 package com.reservation.payment.domain;
 
+import com.reservation.payment.domain.exception.InvalidFailureReasonException;
+
 import java.util.Objects;
 
 record FailureReason(String value) {
     public FailureReason {
-        Objects.requireNonNull(value);
+        Objects.requireNonNull(value, "Failure reason cannot be null");
         if (value.isBlank()) {
-            throw new IllegalArgumentException("Failure reason cannot be blank");
+            throw new InvalidFailureReasonException(value);
         }
     }
 }

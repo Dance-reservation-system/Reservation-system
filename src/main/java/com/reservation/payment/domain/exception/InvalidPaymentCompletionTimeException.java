@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 
 public class InvalidPaymentCompletionTimeException extends RuntimeException {
 
-    private static final String MESSAGE = "Payment completion time cannot be in the future: ";
+    private static final String MESSAGE = "Payment completion time cannot be in the future: %s";
 
     public InvalidPaymentCompletionTimeException(LocalDateTime timestamp) {
-        super(MESSAGE + timestamp);
+        super(String.format(MESSAGE, timestamp));
     }
 }

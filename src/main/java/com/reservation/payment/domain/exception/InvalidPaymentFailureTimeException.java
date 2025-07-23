@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 
 public class InvalidPaymentFailureTimeException extends RuntimeException {
 
-    private static final String MESSAGE = "Payment initiation time cannot be in the future: ";
+    private static final String MESSAGE = "Payment initiation time cannot be in the future: %s";
 
     public InvalidPaymentFailureTimeException(LocalDateTime timestamp) {
-        super(MESSAGE + timestamp);
+        super(String.format(MESSAGE, timestamp));
     }
 }

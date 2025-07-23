@@ -9,8 +9,9 @@ record PaymentCompletedAt(LocalDateTime value) {
 
     PaymentCompletedAt {
         Objects.requireNonNull(value, "Payment completion time must not be null");
-        if (value.isAfter(LocalDateTime.now())) {
-            throw new InvalidPaymentCompletionTimeException(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        if (value.isAfter(now)) {
+            throw new InvalidPaymentCompletionTimeException(value);
         }
     }
 

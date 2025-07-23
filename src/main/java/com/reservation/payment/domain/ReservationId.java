@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 record ReservationId(UUID value) {
-    public ReservationId {
+    ReservationId {
         Objects.requireNonNull(value);
     }
 

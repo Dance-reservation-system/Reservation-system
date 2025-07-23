@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 
 public class InvalidMoneyAmountException extends RuntimeException {
 
-    private static final String MESSAGE_TEMPLATE = "Money amount must be non-negative %s";
+    private static final String MESSAGE = "Money amount must be non-negative %s";
 
     public InvalidMoneyAmountException(BigDecimal amount) {
-        super(String.format(MESSAGE_TEMPLATE, amount));
+        super(String.format(MESSAGE, amount));
     }
 }

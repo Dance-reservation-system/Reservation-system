@@ -4,11 +4,9 @@ import java.util.Currency;
 
 public class CurrencyMismatchException extends RuntimeException {
 
-    public CurrencyMismatchException(Currency expected, Currency actual) {
-        super(message(expected, actual));
-    }
+    private static final String MESSAGE = "Currency mismatch: expected %s, but got %s";
 
-    public static String message(Currency expected, Currency actual) {
-        return "Currency mismatch: expected " + expected + ", but got " + actual;
+    public CurrencyMismatchException(Currency expected, Currency actual) {
+        super(String.format(MESSAGE, expected, actual));
     }
 }

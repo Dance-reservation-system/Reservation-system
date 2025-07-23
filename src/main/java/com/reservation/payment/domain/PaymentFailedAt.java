@@ -10,7 +10,8 @@ record PaymentFailedAt(LocalDateTime value) {
     PaymentFailedAt {
         Objects.requireNonNull(value, "Failure time must not be null");
 
-        if (value.isAfter(LocalDateTime.now())) {
+        LocalDateTime now = LocalDateTime.now();
+        if (value.isAfter(now)) {
             throw new InvalidPaymentFailureTimeException(value);
         }
     }

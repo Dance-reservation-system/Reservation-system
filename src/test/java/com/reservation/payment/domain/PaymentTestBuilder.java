@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Currency;
 
-public class PaymentTestBuilder {
+class PaymentTestBuilder {
 
     private PaymentId paymentId = PaymentId.next();
     private ReservationId reservationId = ReservationId.next();
