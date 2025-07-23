@@ -4,11 +4,11 @@ import java.util.Objects;
 import java.util.UUID;
 
 record ClientId(UUID value) {
-    public ClientId {
+    ClientId {
         Objects.requireNonNull(value);
     }
 
-    public static ClientId next() {
+    static ClientId next() {
         return new ClientId(UUID.randomUUID());
     }
 }

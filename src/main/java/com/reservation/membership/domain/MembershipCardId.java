@@ -4,11 +4,11 @@ import java.util.Objects;
 import java.util.UUID;
 
 record MembershipCardId(UUID value) {
-    public MembershipCardId {
+    MembershipCardId {
         Objects.requireNonNull(value);
     }
 
-    public static MembershipCardId next(){
+    static MembershipCardId next() {
         return new MembershipCardId(UUID.randomUUID());
     }
 }

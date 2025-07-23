@@ -1,9 +1,6 @@
 package com.reservation.membership.domain;
 
 import com.reservation.common.AggregateRoot;
-import com.reservation.membership.domain.exception.InvalidValidityDaysException;
-import com.reservation.membership.domain.exception.MembershipCardNotValidException;
-import com.reservation.membership.domain.exception.NoRemainingEntriesException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,66 +10,38 @@ import java.util.Objects;
 public class MembershipCard implements AggregateRoot<MembershipCardEvent> {
     private final MembershipCardId membershipCardId;
     private final ClientId clientId;
-    private Entries entries;
-    private LocalDate firstUseDate;
-    private final int validityDays;
+    private ValidEntries validEntries;
 
-    private final ArrayList<MembershipCardEvent> membershipCardEvents = new ArrayList<>();
+    private final List<MembershipCardEvent> membershipCardEvents = new ArrayList<>();
 
-    private MembershipCard(MembershipCardId membershipCardId, ClientId clientId, EntryType entryType, int validityDays) {
+    private MembershipCard(MembershipCardId membershipCardId, ClientId clientId, ValidEntries validEntries) {
         this.membershipCardId = Objects.requireNonNull(membershipCardId);
         this.clientId = Objects.requireNonNull(clientId);
-        if (validityDays <= 0) {
-            throw new InvalidValidityDaysException();
-        }
-        this.validityDays = validityDays;
-        Objects.requireNonNull(entryType);
-        this.entries = new Entries(entryType, entryType.getValue());
-        this.firstUseDate = null;
+        this.validEntries = Objects.requireNonNull(validEntries);
     }
 
-    public static MembershipCard create(MembershipCardId membershipCardId, ClientId clientId, EntryType entryType, int validityDays) {
-        MembershipCard membershipCard = new MembershipCard(membershipCardId, clientId, entryType, validityDays);
+    static MembershipCard create(MembershipCardId membershipCardId, ClientId clientId, ValidEntries validEntries) {
+        MembershipCard membershipCard = new MembershipCard(membershipCardId, clientId, validEntries);
         membershipCard.registerEvent(new MembershipCardCreated(membershipCardId, clientId));
+        membershipCard.registerEvent(new MembershipCardActivated(membershipCardId, validEntries.validFrom()));
         return membershipCard;
     }
 
-    public MembershipCardId getMembershipCardId() {
+    MembershipCardId getMembershipCardId() {
         return this.membershipCardId;
     }
 
-    public ClientId getClientId() {
+    ClientId getClientId() {
         return this.clientId;
     }
 
-    public void useEntry(LocalDate date) {
-        if (entries.noRemainingEntries()) {
-            throw new NoRemainingEntriesException();
-        }
-        if (firstUseDate == null) {
-            firstUseDate = date;
-            registerEvent(new MembershipCardFirstUsed(membershipCardId, firstUseDate));
-        }
-        assertValidAt(date);
-        this.entries = entries.useEntry();
-        registerEvent(new MembershipCardEntryUsed(membershipCardId, entries.remaining()));
+    void useEntry(LocalDate date) {
+        this.validEntries = validEntries.useEntry(date);
+        registerEvent(new MembershipCardEntryUsed(membershipCardId, validEntries.remaining()));
     }
 
-    public void assertValidAt(LocalDate date) {
-        if (entries.noRemainingEntries()) {
-            throw new NoRemainingEntriesException();
-        }
-        if (firstUseDate == null) {
-            throw new MembershipCardNotValidException("Membership card has not been activated yet.");
-        }
-        LocalDate expirationDate = firstUseDate.plusDays(validityDays);
-        if (date.isAfter(expirationDate)) {
-            throw new MembershipCardNotValidException("Membership card expired on " + expirationDate);
-        }
-    }
-
-    public LocalDate getExpirationDate() {
-        return firstUseDate != null ? firstUseDate.plusDays(validityDays) : null;
+    LocalDate getExpirationDate() {
+        return validEntries.getExpirationDate();
     }
 
     @Override
@@ -85,5 +54,17 @@ public class MembershipCard implements AggregateRoot<MembershipCardEvent> {
     @Override
     public void registerEvent(MembershipCardEvent event) {
         membershipCardEvents.add(event);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        MembershipCard that = (MembershipCard) o;
+        return Objects.equals(membershipCardId, that.membershipCardId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(membershipCardId);
     }
 }

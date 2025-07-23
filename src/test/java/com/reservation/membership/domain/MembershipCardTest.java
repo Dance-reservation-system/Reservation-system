@@ -1,6 +1,8 @@
 package com.reservation.membership.domain;
 
-import com.reservation.membership.domain.exception.MembershipCardNotValidException;
+import com.reservation.membership.domain.exception.MembershipCardExpiredException;
+import com.reservation.membership.domain.exception.MembershipCardNotStartedException;
+import com.reservation.membership.domain.exception.NoRemainingEntriesException;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -10,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MembershipCardTest {
@@ -18,7 +19,7 @@ class MembershipCardTest {
     private final LocalDate today = LocalDate.now();
 
     @Test
-    void shouldCreateMembershipCardAndEmitCreatedEvent() {
+    void shouldCreateMembershipCardAndEmitEvent() {
         MembershipCard card = new MembershipCardTestBuilder().build();
 
         List<MembershipCardEvent> events = card.pullEvents();
@@ -32,72 +33,73 @@ class MembershipCardTest {
     }
 
     @Test
-    void shouldUseEntryAndEmitFirstUseAndEntryUsedEvents() {
-        MembershipCard card = new MembershipCardTestBuilder().build();
+    void shouldUseEntryAndEmitEvents() {
+        MembershipCard card = new MembershipCardTestBuilder().withEntryType(entryType).build();
 
         card.useEntry(today);
 
         List<MembershipCardEvent> events = card.pullEvents();
 
-        MembershipCardFirstUsed firstUsed = findEvent(events, MembershipCardFirstUsed.class);
+        MembershipCardActivated activated = findEvent(events, MembershipCardActivated.class);
         MembershipCardEntryUsed entryUsed = findEvent(events, MembershipCardEntryUsed.class);
 
         assertAll(
-                () -> assertEquals(today, firstUsed.firstUseDate()),
-                () -> assertEquals(entryType.getValue() - 1, entryUsed.remaining()),
-                () -> assertDoesNotThrow(() -> card.assertValidAt(today))
+                () -> assertEquals(today, activated.validFrom()),
+                () -> assertEquals(entryType.getValue() - 1, entryUsed.remaining())
         );
     }
 
     @Test
-    void shouldReturnNullExpirationDateBeforeFirstUse() {
-        MembershipCard card = new MembershipCardTestBuilder().withValidityDays(60).build();
-
-        assertNull(card.getExpirationDate());
-    }
-
-    @Test
     void shouldReturnCorrectExpirationDateAfterFirstUse() {
-        MembershipCard card = new MembershipCardTestBuilder().withValidityDays(60).build();
+        MembershipCard card = new MembershipCardTestBuilder().withType(MembershipCardType.MONTH).build();
 
         card.useEntry(today);
 
-        assertEquals(today.plusDays(60), card.getExpirationDate());
+        LocalDate expirationDate = today.plusDays(MembershipCardType.MONTH.getValue());
+
+        assertEquals(expirationDate, card.getExpirationDate());
     }
 
     @Test
-    void shouldBeValidOnExpirationDate() {
+    void shouldThrowWhenUsingEntryAfterExpiration() {
+        MembershipCard card = new MembershipCardTestBuilder().withType(MembershipCardType.ONE_WEEK).build();
+
+        card.useEntry(today);
+
+        LocalDate afterExpiration = today.plusDays(MembershipCardType.ONE_WEEK.getValue() + 1);
+
+        assertThrows(MembershipCardExpiredException.class, () -> card.useEntry(afterExpiration));
+    }
+
+    @Test
+    void shouldThrowWhenUsingEntryBeforeValidFromDate() {
         MembershipCard card = new MembershipCardTestBuilder().build();
+
         card.useEntry(today);
 
-        LocalDate expirationDate = today.plusDays(30);
+        LocalDate beforeValidFrom = today.minusDays(1);
 
-        assertDoesNotThrow(() -> card.assertValidAt(expirationDate));
+        assertThrows(MembershipCardNotStartedException.class, () -> card.useEntry(beforeValidFrom));
     }
 
     @Test
-    void shouldThrowWhenValidatingBeforeFirstUse() {
-        MembershipCard card = new MembershipCardTestBuilder().build();
+    void shouldAllowUseEntryOnExpirationDate() {
+        MembershipCard card = new MembershipCardTestBuilder().withType(MembershipCardType.ONE_WEEK).build();
 
-        assertThrows(MembershipCardNotValidException.class, () -> card.assertValidAt(today));
+        card.useEntry(today);
+
+        LocalDate expirationDate = today.plusDays(MembershipCardType.ONE_WEEK.getValue());
+
+        assertDoesNotThrow(() -> card.useEntry(expirationDate));
     }
 
     @Test
-    void shouldNotAllowUsingEntryWhenExpired() {
+    void shouldThrowWhenNoRemainingEntries() {
         MembershipCard card = new MembershipCardTestBuilder().withEntryType(EntryType.ONE).build();
+
         card.useEntry(today);
 
-        LocalDate afterExpiration = today.plusDays(31);
-
-        assertThrows(MembershipCardNotValidException.class, () -> card.useEntry(afterExpiration));
-    }
-
-    @Test
-    void shouldNotAllowUsingEntryWhenNoRemainingEntries() {
-        MembershipCard card = new MembershipCardTestBuilder().withEntryType(EntryType.ONE).build();
-        card.useEntry(today);
-
-        assertThrows(MembershipCardNotValidException.class, () -> card.useEntry(today));
+        assertThrows(NoRemainingEntriesException.class, () -> card.useEntry(today));
     }
 
     private <T> T findEvent(List<MembershipCardEvent> events, Class<T> clazz) {

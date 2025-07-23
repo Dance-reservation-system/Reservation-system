@@ -1,11 +1,13 @@
 package com.reservation.membership.domain;
 
-enum EntryType {
-    ONE(1), FOUR(4), EIGHT(8), TWELVE(12);
+enum MembershipCardType {
+    ONE_WEEK(7),
+    TWO_WEEKS(14),
+    MONTH(30);
 
     private final int value;
 
-    EntryType(int value) {
+    MembershipCardType(int value) {
         this.value = value;
     }
 
