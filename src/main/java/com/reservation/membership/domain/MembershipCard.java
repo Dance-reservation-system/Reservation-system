@@ -36,7 +36,7 @@ public class MembershipCard implements AggregateRoot<MembershipCardEvent> {
     }
 
     void useEntry(LocalDate date) {
-        this.validEntries = validEntries.useEntry(date);
+        this.validEntries = validEntries.useEntry(Objects.requireNonNull(date));
         registerEvent(new MembershipCardEntryUsed(membershipCardId, validEntries.remaining()));
     }
 
@@ -53,7 +53,7 @@ public class MembershipCard implements AggregateRoot<MembershipCardEvent> {
 
     @Override
     public void registerEvent(MembershipCardEvent event) {
-        membershipCardEvents.add(event);
+        membershipCardEvents.add(Objects.requireNonNull(event));
     }
 
     @Override

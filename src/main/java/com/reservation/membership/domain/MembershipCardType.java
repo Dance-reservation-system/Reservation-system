@@ -5,13 +5,13 @@ enum MembershipCardType {
     TWO_WEEKS(14),
     MONTH(30);
 
-    private final int value;
+    private final int durationInDays;
 
-    MembershipCardType(int value) {
-        this.value = value;
+    MembershipCardType(int durationInDays) {
+        this.durationInDays = durationInDays;
     }
 
-    int getValue() {
-        return this.value;
+    int getDurationInDays() {
+        return this.durationInDays;
     }
 }

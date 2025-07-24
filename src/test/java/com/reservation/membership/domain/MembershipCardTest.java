@@ -55,7 +55,7 @@ class MembershipCardTest {
 
         card.useEntry(today);
 
-        LocalDate expirationDate = today.plusDays(MembershipCardType.MONTH.getValue());
+        LocalDate expirationDate = today.plusDays(MembershipCardType.MONTH.getDurationInDays());
 
         assertEquals(expirationDate, card.getExpirationDate());
     }
@@ -66,7 +66,7 @@ class MembershipCardTest {
 
         card.useEntry(today);
 
-        LocalDate afterExpiration = today.plusDays(MembershipCardType.ONE_WEEK.getValue() + 1);
+        LocalDate afterExpiration = today.plusDays(MembershipCardType.ONE_WEEK.getDurationInDays() + 1);
 
         assertThrows(MembershipCardExpiredException.class, () -> card.useEntry(afterExpiration));
     }
@@ -88,7 +88,7 @@ class MembershipCardTest {
 
         card.useEntry(today);
 
-        LocalDate expirationDate = today.plusDays(MembershipCardType.ONE_WEEK.getValue());
+        LocalDate expirationDate = today.plusDays(MembershipCardType.ONE_WEEK.getDurationInDays());
 
         assertDoesNotThrow(() -> card.useEntry(expirationDate));
     }

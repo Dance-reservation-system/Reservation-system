@@ -10,10 +10,12 @@ import java.util.Objects;
 
 record ValidEntries(EntryType type, int remaining, LocalDate validFrom, MembershipCardType membershipCardType) {
     ValidEntries {
+        Objects.requireNonNull(type);
+        Objects.requireNonNull(validFrom);
+        Objects.requireNonNull(membershipCardType);
         if (remaining < 0 || remaining > type.getValue()) {
             throw new InvalidEntriesCountException(type.getValue());
         }
-        Objects.requireNonNull(validFrom);
     }
 
     ValidEntries useEntry(LocalDate atDate) {
@@ -34,7 +36,7 @@ record ValidEntries(EntryType type, int remaining, LocalDate validFrom, Membersh
     }
 
     LocalDate getExpirationDate() {
-        return validFrom.plusDays(membershipCardType.getValue());
+        return validFrom.plusDays(membershipCardType.getDurationInDays());
     }
 
     boolean noRemainingEntries() {
