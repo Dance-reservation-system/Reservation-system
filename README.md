@@ -67,7 +67,7 @@ A modern reservation system **engineered with Domain-Driven Design (DDD) and Cle
   - Create and update rooms
   - Set capacity
   - Deactivate rooms for maintenance
-- Define membership card types (e.g. 1-entry, 4-entry, monthly)
+- Define membership card types
 - Set rules for entry limits and expiration policies
 - Override or delete class sessions
 - Generate reports on attendance and instructor activity
