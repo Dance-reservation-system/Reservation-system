@@ -1,5 +1,6 @@
 package com.reservation.payment.domain;
 
+import com.reservation.payment.domain.exception.InvalidFailureReasonException;
 import com.reservation.payment.domain.exception.PaymentAlreadyCompletedException;
 import com.reservation.payment.domain.exception.PaymentAlreadyFailedException;
 import org.junit.jupiter.api.Test;
@@ -157,7 +158,7 @@ class PaymentTest {
 
     @Test
     void shouldThrowOnBlankFailureReason() {
-        assertThrows(IllegalArgumentException.class, () -> new FailureReason("   "));
+        assertThrows(InvalidFailureReasonException.class, () -> new FailureReason("   "));
     }
 
     @Test
