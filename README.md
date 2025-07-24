@@ -2,19 +2,18 @@
 
 A modern reservation system **engineered with Domain-Driven Design (DDD) and Clean Architecture** powered by **Java 21** and **Spring Boot 3**, featuring RBAC + ABAC, membership management, class scheduling, and many more.
 
-[![Last Commit](https://img.shields.io/github/last-commit/Dance-reservation-system/Reservation-system?style=flat-square&color=green&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/commits)
+[![Last Commit](https://img.shields.io/github/last-commit/Dance-reservation-system/Reservation-system?style=flat-square&color=darkgreen&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/commits)
 
-[![Open Issues](https://img.shields.io/github/issues/Dance-reservation-system/Reservation-system?style=flat-square&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/issues)
+[![Open Issues](https://img.shields.io/github/issues/Dance-reservation-system/Reservation-system?style=flat-square&color=red&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/issues)
 
-[![Open PRs](https://img.shields.io/github/issues-pr/Dance-reservation-system/Reservation-system?style=flat-square&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/pulls)
+[![Open PRs](https://img.shields.io/github/issues-pr/Dance-reservation-system/Reservation-system?style=flat-square&color=teal&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/pulls)
 
-[![BE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Reservation-system?style=flat-square&color=green&label=BE%20Contributors&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/graphs/contributors)
+[![BE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/Reservation-system?style=flat-square&color=darkgreen&label=BE%20Contributors&logo=github)](https://github.com/Dance-reservation-system/Reservation-system/graphs/contributors)
 [![FE Contributors](https://img.shields.io/github/contributors/Dance-reservation-system/reservation-system-web?style=flat-square&color=blue&label=FE%20Contributors&logo=github)](https://github.com/Dance-reservation-system/reservation-system-web/graphs/contributors)
 
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Dance-reservation-system_Kamann-modular&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Dance-reservation-system_Kamann-modular)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Dance-reservation-system_Kamann-modular&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Dance-reservation-system_Kamann-modular)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Dance-reservation-system_Kamann-modular&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Dance-reservation-system_Kamann-modular)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Dance-reservation-system_Kamann-modular&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Dance-reservation-system_Kamann-modular)
 
 ## ⚙️ Tech Stack
 
@@ -49,43 +48,87 @@ A modern reservation system **engineered with Domain-Driven Design (DDD) and Cle
 
 ---
 
-## 🌟 Features
+## 🌟 Features by Role
 
 <details>
-<summary>Click to view role-specific features</summary>
+<summary>Click to expand detailed feature list per system role</summary>
+
+---
 
 ### 🛡️ Owner
-- Manage user accounts (create, update, deactivate, assign roles)
-- Configure studio settings (business hours, cancellation policy, contact info)
-- Manage rooms (create, deactivate, assign to sessions)
-- Define membership card types (entry limits, expiration rules)
-- View schedule of all sessions and generate attendance reports
-- Override or delete sessions (even if booked)
+
+- Create and manage system users (Instructor, Receptionist, Client) using Keycloak ID
+- Assign and modify user roles within domain constraints
+- Configure global studio settings:
+  - Business hours
+  - Cancellation policy
+  - Studio contact information
+- Manage studio halls:
+  - Create and update rooms
+  - Set capacity
+  - Deactivate rooms for maintenance
+- Define membership card types (e.g. 1-entry, 4-entry, monthly)
+- Set rules for entry limits and expiration policies
+- Override or delete class sessions
+- Generate reports on attendance and instructor activity
+
+---
 
 ### 🧾 Receptionist
-- View today’s session list with instructor, room, and number of bookings
-- Assign or change rooms for upcoming sessions (if available)
-- Cancel sessions according to policy
-- Verify client membership card validity at check-in
-- Search for clients and manage their reservations on request
-- Mark a session as “in progress” when it starts
+
+- View today’s full session list with instructors, rooms, and booking stats
+- Check in clients at the front desk (manual attendance logging)
+- Cancel client reservations before session start (according to policy)
+- Verify membership validity at check-in (via membership module)
+- Search for clients and view reservation details
+- Mark sessions as "in progress" when the instructor arrives
+- Assist clients with on-site reservation management
+
+---
 
 ### 🕺 Instructor
-- Create class sessions with title, type, date, time, duration, and hall assigned
-- Edit upcoming sessions (start time, capacity, room)
-- Cancel own sessions if no clients are registered
-- View personal teaching schedule
+
+- Create class sessions (title, type, room, capacity, time range)
+- Modify own upcoming sessions (if no clients are registered)
+- Cancel sessions that haven’t started
+- View teaching schedule (past and upcoming)
+- Assign available halls for their own sessions
+
+---
 
 ### 💃 Client
-- Browse upcoming sessions with filters (instructor, type, date)
-- Reserve a session if a valid membership card is held
-- Cancel reservations before the allowed deadline
-- Receive booking confirmations and expiration alerts
-- View full history of past and upcoming reservations
+
+- Browse available sessions by date, instructor, or class type
+- Reserve sessions (only with valid membership card)
+- Cancel reservations before cancellation window closes
+- Receive confirmation and alerts for booking and membership status
+- View full history of past and future reservations
+- Track active membership card (expiration, entries left)
 
 </details>
 
 ---
+
+### 📂 Project Structure
+
+This project follows a **Modular Monolith** architecture based on **DDD Bounded Contexts**.  
+Each module encapsulates a specific business capability and exposes only its application layer.
+
+
+| Module          | Description |
+|------------------|-------------|
+| `useraccess`     | Manages system users, roles, and identity integration via Keycloak |
+| `client`         | Handles client identity, reservation rights, and membership access |
+| `instructor`     | Contains instructor details and teaching-related data |
+| `owner`          | Studio administrator: manages rooms, membership types, and policies |
+| `event`          | Manages class sessions and occurrences (acts as the scheduling domain) |
+| `reservation`    | Encapsulates the reservation lifecycle and constraints |
+| `attendance`     | Tracks client attendance per session occurrence |
+| `membership`     | Issues and manages membership cards with entry limits and expiration |
+| `payment`        | Handles payments for reservations, including lifecycle and events |
+| `reception`      | Records receptionist actions (e.g. manual check-ins, cancellations) |
+
+
 
 ## 🚀 Installation
 
@@ -154,11 +197,11 @@ docker compose up -d --build
   - Integration testing with H2 in-memory database (GithubActions Workflow)
   - Production deploys via Railway (Dedicated release branch)
   - Production secrets managed through GitHub Secrets + Railway Secrets
-  
+
 
 ### 🖥️ Frontend
   Client available at:
-**[https://github.com/Dance-reservation-system/Kamann-web](https://github.com/Dance-reservation-system/Kamann-web)**
+**[https://github.com/Dance-reservation-system/reservation-system-web](https://github.com/Dance-reservation-system/reservation-system-web)**
 
 ### 📝 Ideas
 
