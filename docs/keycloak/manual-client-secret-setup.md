@@ -2,7 +2,7 @@
 
 ## To run the application that communicates with a remote Keycloak instance, you need to obtain the current access credentials and update the .env file located in the root directory of the project accordingly. Then, simply run the application in the dev environment.
 
-# Manual Configuration of `client_secret` in Keycloak (since version 25)
+# Manual Configuration of `client_secret` in Keycloak (since version 25) for local run purposes.
 
 Starting with **Keycloak version 25**, the ability to automatically import the `client_secret` value during realm import has been **intentionally disabled**. This change affects confidential clients (OIDC), for which the secret must now be **manually set in the admin console** after import.
 
