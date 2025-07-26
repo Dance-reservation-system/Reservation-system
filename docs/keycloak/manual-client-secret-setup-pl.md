@@ -1,6 +1,6 @@
 ### 📘 Ten poradnik jest również dostępny w [🇬🇧 wersji angielskiej](manual-client-secret-setup.md)
 
-## Aby uruchomić aplikację komunikującą się z zdalną instancją keycloak należy uzyskać aktualne dane dostępowe oraz odpowiednio zaktualizować plik '.env' znajdujący się w katalogu głównym projektu. Następnie wystarczy uruchomić aplikację w środowisku 'dev'
+## Aby uruchomić aplikację komunikującą się z zdalną instancją keycloak należy uzyskać aktualne dane dostępowe od właściciela projektu oraz odpowiednio zaktualizować plik '.env' znajdujący się w katalogu głównym projektu. Następnie wystarczy uruchomić aplikację w środowisku 'dev'
 
 # Ręczna konfiguracja `client_secret` w Keycloak (od wersji 25) na potrzeby lokalnego uruchomienia
 
