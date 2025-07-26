@@ -1,6 +1,8 @@
 ### 📘 Ten poradnik jest również dostępny w [🇬🇧 wersji angielskiej](manual-client-secret-setup.md)
 
-# Ręczna konfiguracja `client_secret` w Keycloak (od wersji 25)
+## Aby uruchomić aplikację komunikującą się z zdalną instancją keycloak należy uzyskać aktualne dane dostępowe oraz odpowiednio zaktualizować plik '.env' znajdujący się w katalogu głównym projektu. Następnie wystarczy uruchomić aplikację w środowisku 'dev'
+
+# Ręczna konfiguracja `client_secret` w Keycloak (od wersji 25) na potrzeby lokalnego uruchomienia
 
 Począwszy od **Keycloak w wersji 25**, możliwość automatycznego importowania wartości `client_secret` podczas importu realm została **celowo wyłączona**. Zmiana ta dotyczy klientów typu confidential (OIDC), dla których sekret musi być teraz **ręcznie ustawiany w panelu administracyjnym** po imporcie.
 
