@@ -1,6 +1,6 @@
 package com.reservation.studio.domain;
 
-import com.reservation.studio.domain.exception.ContactDetailsCannotBeEmptyException;
+import com.reservation.studio.domain.exception.ContactDetailsCannotBeBlankException;
 
 import java.util.Objects;
 
@@ -9,8 +9,8 @@ record ContactDetails(String address, String phoneNumber) {
         Objects.requireNonNull(address);
         Objects.requireNonNull(phoneNumber);
 
-        if(address.isEmpty() || phoneNumber.isEmpty()){
-            throw new ContactDetailsCannotBeEmptyException();
+        if (address.isBlank() || phoneNumber.isBlank()) {
+            throw new ContactDetailsCannotBeBlankException();
         }
     }
 }

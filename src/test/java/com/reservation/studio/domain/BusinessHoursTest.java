@@ -66,7 +66,6 @@ class BusinessHoursTest {
         assertThatThrownBy(() -> new BusinessHours(invalidMap)).isInstanceOf(MissingBusinessHoursScheduleException.class);
     }
 
-
     @Test
     void shouldThrowIfNullHoursMap() {
         assertThatThrownBy(() -> new BusinessHours(null)).isInstanceOf(NullPointerException.class);

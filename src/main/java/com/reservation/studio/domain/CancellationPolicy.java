@@ -12,8 +12,4 @@ record CancellationPolicy(Duration duration) {
             throw new InvalidCancellationThresholdException(duration);
         }
     }
-
-    Duration threshold() {
-        return duration;
-    }
 }

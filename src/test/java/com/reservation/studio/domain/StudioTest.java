@@ -1,6 +1,6 @@
 package com.reservation.studio.domain;
 
-import com.reservation.studio.domain.exception.ContactDetailsCannotBeEmptyException;
+import com.reservation.studio.domain.exception.ContactDetailsCannotBeBlankException;
 import com.reservation.studio.domain.exception.InvalidCancellationThresholdException;
 import com.reservation.studio.domain.exception.InvalidStudioNameException;
 import com.reservation.studio.domain.exception.StudioAlreadyActiveException;
@@ -13,7 +13,6 @@ import java.time.LocalTime;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,6 +27,7 @@ class StudioTest {
                 () -> assertThat(studio.pullEvents()).anyMatch(e -> e instanceof StudioCreated)
         );
     }
+
     @Test
     void shouldRenameStudioAndEmitRenamedEvent() {
         Studio studio = new StudioTestBuilder().build();
@@ -68,6 +68,18 @@ class StudioTest {
     }
 
     @Test
+    void shouldUpdateContactDetails() {
+        Studio studio = new StudioTestBuilder().build();
+        ContactDetails newContactDetails = new ContactDetails("new Address", "987654321");
+
+        studio.updateContactDetails(newContactDetails);
+
+        assertAll(
+                () -> assertThat(studio.pullEvents()).anyMatch(e -> e instanceof ContactDetailsUpdated)
+        );
+    }
+
+    @Test
     void shouldActivateStudioAndEmitActivatedEvent() {
         Studio studio = new StudioTestBuilder().build();
 
@@ -102,12 +114,26 @@ class StudioTest {
     }
 
     @Test
+    void shouldReactivateClosedStudio() {
+        Studio studio = new StudioTestBuilder().build();
+
+        studio.activate();
+        studio.close();
+        studio.activate();
+
+        assertAll(
+                () -> assertTrue(studio.isActive())
+        );
+    }
+
+    @Test
     void shouldThrowWhenClosingInactiveOrAlreadyClosedStudio() {
         Studio studio = new StudioTestBuilder().build();
         assertThrows(StudioAlreadyClosedException.class, studio::close);
 
         studio.activate();
         studio.close();
+
         assertThrows(StudioAlreadyClosedException.class, studio::close);
     }
 
@@ -150,17 +176,17 @@ class StudioTest {
     }
 
     @Test
-    void shouldThrowOnEmptyContactDetails(){
-        assertThrows(ContactDetailsCannotBeEmptyException.class, () -> new ContactDetails("", "123456789"));
+    void shouldThrowOnBlankContactDetails() {
+        assertThrows(ContactDetailsCannotBeBlankException.class, () -> new ContactDetails("  ", "123456789"));
     }
 
     @Test
-    void shouldThrowOnNegativeCancellationPolicy(){
+    void shouldThrowOnNegativeCancellationPolicy() {
         assertThrows(InvalidCancellationThresholdException.class, () -> new CancellationPolicy(Duration.ofHours(-1)));
     }
 
     @Test
-    void shouldThrowOnEmptyStudioName(){
+    void shouldThrowOnEmptyStudioName() {
         assertThrows(InvalidStudioNameException.class, () -> new StudioName("     "));
     }
 }
