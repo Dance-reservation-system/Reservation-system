@@ -1,7 +1,7 @@
 package com.reservation.instructor.domain;
 
 import com.reservation.instructor.domain.exception.InvalidInstructorProfileException;
-import com.reservation.instructor.domain.exception.InvalidInstructorSpecialityException;
+import com.reservation.instructor.domain.exception.InvalidInstructorSpecialtyException;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -49,21 +49,21 @@ class InstructorProfileTest {
 
     @Test
     void shouldThrowExceptionWhenSpecialtiesContainsNullElements() {
-        Set<InstructorSpecialty> invalidSpecialities = new HashSet<>();
-        invalidSpecialities.add(SPECIALTY);
-        invalidSpecialities.add(null);
+        Set<InstructorSpecialty> invalidSpecialties = new HashSet<>();
+        invalidSpecialties.add(SPECIALTY);
+        invalidSpecialties.add(null);
 
         assertThrows(InvalidInstructorProfileException.class, () ->
                 new InstructorProfile(NAME,
-                        invalidSpecialities,
+                        invalidSpecialties,
                         BIO
                 )
         );
     }
 
     @Test
-    void shouldThrowExceptionWhenAnyOfTheSpecialitiesIsNull() {
-        assertThrows(InvalidInstructorSpecialityException.class, () ->
+    void shouldThrowExceptionWhenAnyOfTheSpecialtiesIsNull() {
+        assertThrows(InvalidInstructorSpecialtyException.class, () ->
                 new InstructorProfile(NAME,
                         Set.of(SPECIALTY, new InstructorSpecialty(null)),
                         BIO
@@ -72,8 +72,8 @@ class InstructorProfileTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenAnyOfTheSpecialitiesIsBlank() {
-        assertThrows(InvalidInstructorSpecialityException.class, () ->
+    void shouldThrowExceptionWhenAnyOfTheSpecialtiesIsBlank() {
+        assertThrows(InvalidInstructorSpecialtyException.class, () ->
                 new InstructorProfile(NAME,
                         Set.of(SPECIALTY, new InstructorSpecialty("  ")),
                         BIO
