@@ -4,7 +4,7 @@ enum InstructorStatus {
     ACTIVE,
     INACTIVE;
 
-    public boolean isActive() {
+    boolean isActive() {
         return this == ACTIVE;
     }
 }

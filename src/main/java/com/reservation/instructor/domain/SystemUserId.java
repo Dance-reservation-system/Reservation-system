@@ -4,11 +4,11 @@ import java.util.Objects;
 import java.util.UUID;
 
 record SystemUserId(UUID value) {
-    public SystemUserId {
+    SystemUserId {
         Objects.requireNonNull(value);
     }
 
-    public static SystemUserId next() {
+    static SystemUserId next() {
         return new SystemUserId(UUID.randomUUID());
     }
 }

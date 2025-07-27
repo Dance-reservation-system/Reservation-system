@@ -1,19 +1,16 @@
 package com.reservation.instructor.domain;
 
-import com.reservation.instructor.domain.exception.InstructorAlreadyActiveException;
-import com.reservation.instructor.domain.exception.InstructorAlreadyInactiveException;
-import com.reservation.instructor.domain.exception.ProfileCannotBeUpdatedWhenInactiveException;
+import com.reservation.instructor.domain.exception.InstructorAlreadyActivatedException;
+import com.reservation.instructor.domain.exception.InstructorAlreadyDeactivatedException;
+import com.reservation.instructor.domain.exception.InstructorProfileCannotBeUpdatedWhenInactiveException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class InstructorTest {
 
@@ -28,9 +25,9 @@ class InstructorTest {
         instructorId = InstructorId.next();
         systemUserId = SystemUserId.next();
 
-        Name name = new Name("John Doe");
-        Specialty specialty = new Specialty("Yoga");
-        Bio bio = new Bio("Experienced instructor");
+        InstructorName name = new InstructorName("John Doe");
+        InstructorSpecialty specialty = new InstructorSpecialty("Yoga");
+        InstructorBio bio = new InstructorBio("Experienced instructor");
 
         instructorProfile = new InstructorProfile(name, Set.of(specialty), bio);
 
@@ -46,38 +43,32 @@ class InstructorTest {
         assertTrue(instructor.isSameProfile(instructorProfile));
         assertTrue(instructor.isActive());
 
-        InstructorCreated instructorCreated = events.stream()
-                .filter(InstructorCreated.class::isInstance)
-                .map(InstructorCreated.class::cast)
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Expected InstructorCreated event"));
+        InstructorCreatedEvent event = findFirstEventWithClass(InstructorCreatedEvent.class)
+                .orElseThrow(() -> new AssertionError("Expected InstructorCreatedEvent"));
 
         assertAll(
-                () -> assertEquals(instructorId, instructorCreated.instructorId()),
-                () -> assertEquals(systemUserId, instructorCreated.systemUserId()),
-                () -> assertNotNull(instructorCreated.createdAt())
+                () -> assertEquals(instructorId, event.instructorId()),
+                () -> assertEquals(systemUserId, event.systemUserId()),
+                () -> assertNotNull(event.createdAt())
         );
     }
 
     @Test
     void shouldUpdateProfileWhenActive() {
-        Name newName = new Name("Jane Smith");
-        Specialty newSpecialty = new Specialty("Pilates");
-        InstructorProfile newProfile = new InstructorProfile(newName, Set.of(newSpecialty), new Bio("New bio"));
+        InstructorName newName = new InstructorName("Jane Smith");
+        InstructorSpecialty newSpecialty = new InstructorSpecialty("Pilates");
+        InstructorProfile newProfile = new InstructorProfile(newName, Set.of(newSpecialty), new InstructorBio("New bio"));
 
         instructor.updateProfile(newProfile);
         events = instructor.pullEvents();
 
-        InstructorUpdated instructorUpdated = events.stream()
-                .filter(InstructorUpdated.class::isInstance)
-                .map(InstructorUpdated.class::cast)
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Expected InstructorUpdated event"));
+        InstructorUpdatedEvent event = findFirstEventWithClass(InstructorUpdatedEvent.class)
+                .orElseThrow(() -> new AssertionError("Expected InstructorUpdatedEvent"));
 
         assertAll(
-                () -> assertEquals(instructorId, instructorUpdated.instructorId()),
-                () -> assertEquals(systemUserId, instructorUpdated.systemUserId()),
-                () -> assertNotNull(instructorUpdated.updatedAt())
+                () -> assertEquals(instructorId, event.instructorId()),
+                () -> assertEquals(systemUserId, event.systemUserId()),
+                () -> assertNotNull(event.updatedAt())
         );
     }
 
@@ -91,13 +82,13 @@ class InstructorTest {
 
     @Test
     void shouldThrowExceptionWhenUpdatingProfileWhileInactive() {
-        Name newName = new Name("Jane Smith");
-        Specialty newSpecialty = new Specialty("Pilates");
-        InstructorProfile newProfile = new InstructorProfile(newName, Set.of(newSpecialty), new Bio("New bio"));
+        InstructorName newName = new InstructorName("Jane Smith");
+        InstructorSpecialty newSpecialty = new InstructorSpecialty("Pilates");
+        InstructorProfile newProfile = new InstructorProfile(newName, Set.of(newSpecialty), new InstructorBio("New bio"));
 
         instructor.deactivate();
 
-        assertThrows(ProfileCannotBeUpdatedWhenInactiveException.class, () ->
+        assertThrows(InstructorProfileCannotBeUpdatedWhenInactiveException.class, () ->
                 instructor.updateProfile(newProfile)
         );
     }
@@ -110,23 +101,20 @@ class InstructorTest {
 
         assertTrue(instructor.isActive());
 
-        InstructorActivated activatedEvent = events.stream()
-                .filter(InstructorActivated.class::isInstance)
-                .map(InstructorActivated.class::cast)
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Expected InstructorActivated event"));
+        InstructorActivatedEvent event = findFirstEventWithClass(InstructorActivatedEvent.class)
+                .orElseThrow(() -> new AssertionError("Expected InstructorActivatedEvent"));
 
         assertAll(
-                () -> assertEquals(instructorId, activatedEvent.instructorId()),
-                () -> assertEquals(systemUserId, activatedEvent.systemUserId()),
-                () -> assertNotNull(activatedEvent.activatedAt())
+                () -> assertEquals(instructorId, event.instructorId()),
+                () -> assertEquals(systemUserId, event.systemUserId()),
+                () -> assertNotNull(event.activatedAt())
 
         );
     }
 
     @Test
     void shouldThrowWhenActivatingAlreadyActiveInstructor() {
-        assertThrows(InstructorAlreadyActiveException.class, instructor::activate);
+        assertThrows(InstructorAlreadyActivatedException.class, instructor::activate);
     }
 
     @Test
@@ -134,17 +122,13 @@ class InstructorTest {
         instructor.deactivate();
         events = instructor.pullEvents();
 
-
-        InstructorDeactivated instructorDeactivated = events.stream()
-                .filter(InstructorDeactivated.class::isInstance)
-                .map(InstructorDeactivated.class::cast)
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Expected InstructorDeactivated event"));
+        InstructorDeactivatedEvent event = findFirstEventWithClass(InstructorDeactivatedEvent.class)
+                .orElseThrow(() -> new AssertionError("Expected InstructorDeactivatedEvent"));
 
         assertAll(
-                () -> assertEquals(instructorId, instructorDeactivated.instructorId()),
-                () -> assertEquals(systemUserId, instructorDeactivated.systemUserId()),
-                () -> assertNotNull(instructorDeactivated.deactivatedAt())
+                () -> assertEquals(instructorId, event.instructorId()),
+                () -> assertEquals(systemUserId, event.systemUserId()),
+                () -> assertNotNull(event.deactivatedAt())
         );
     }
 
@@ -152,6 +136,13 @@ class InstructorTest {
     void shouldThrowWhenDeactivatingAlreadyInactiveInstructor() {
         instructor.deactivate();
 
-        assertThrows(InstructorAlreadyInactiveException.class, instructor::deactivate);
+        assertThrows(InstructorAlreadyDeactivatedException.class, instructor::deactivate);
+    }
+
+    private <T> Optional<T> findFirstEventWithClass(Class<T> eventClass) {
+        return events.stream()
+                .filter(eventClass::isInstance)
+                .map(eventClass::cast)
+                .findFirst();
     }
 }
