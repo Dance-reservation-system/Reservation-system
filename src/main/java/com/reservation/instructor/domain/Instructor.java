@@ -1,88 +1,107 @@
 package com.reservation.instructor.domain;
 
 import com.reservation.common.AggregateRoot;
-import com.reservation.instructor.domain.exception.InstructorAlreadyActiveException;
-import com.reservation.instructor.domain.exception.InstructorAlreadyInactiveException;
-import com.reservation.instructor.domain.exception.ProfileCannotBeUpdatedWhenInactiveException;
-import lombok.EqualsAndHashCode;
+import com.reservation.instructor.domain.exception.InstructorAlreadyActivatedException;
+import com.reservation.instructor.domain.exception.InstructorAlreadyDeactivatedException;
+import com.reservation.instructor.domain.exception.InstructorProfileCannotBeUpdatedWhenInactiveException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Instructor implements AggregateRoot<InstructorEvent> {
-    @EqualsAndHashCode.Include
+class Instructor implements AggregateRoot<InstructorEvent> {
+
     private final InstructorId instructorId;
     private final SystemUserId systemUserId;
-    private final List<InstructorEvent> instructorEvents = new ArrayList<>();
     private InstructorProfile profile;
     private InstructorStatus status;
 
-    private Instructor(InstructorId instructorId, SystemUserId systemUserId, InstructorProfile profile) {
+    private final List<InstructorEvent> events = new ArrayList<>();
+
+    private Instructor(InstructorId instructorId,
+                       SystemUserId systemUserId,
+                       InstructorProfile profile) {
         this.instructorId = Objects.requireNonNull(instructorId);
         this.systemUserId = Objects.requireNonNull(systemUserId);
         this.profile = Objects.requireNonNull(profile);
         this.status = InstructorStatus.ACTIVE;
     }
 
-    public static Instructor create(InstructorId instructorId, SystemUserId systemUserId, InstructorProfile profile) {
+    static Instructor create(InstructorId instructorId,
+                             SystemUserId systemUserId,
+                             InstructorProfile profile) {
         Instructor instructor = new Instructor(instructorId, systemUserId, profile);
-        instructor.registerEvent(new InstructorCreated(instructorId, systemUserId));
+        instructor.registerEvent(new InstructorCreatedEvent(instructorId, systemUserId));
         return instructor;
     }
 
-    public InstructorId getInstructorId() {
+    InstructorId getInstructorId() {
         return this.instructorId;
     }
 
-    public SystemUserId getSystemUserId() {
+    SystemUserId getSystemUserId() {
         return this.systemUserId;
     }
 
-    public void updateProfile(InstructorProfile profile) {
+    boolean isSameProfile(InstructorProfile profile) {
+        return this.profile.equals(profile);
+    }
+
+    void updateProfile(InstructorProfile profile) {
         if (!isSameProfile(profile)) {
             if (!isActive()) {
-                throw new ProfileCannotBeUpdatedWhenInactiveException();
+                throw new InstructorProfileCannotBeUpdatedWhenInactiveException();
             }
             this.profile = Objects.requireNonNull(profile);
-            registerEvent(new InstructorUpdated(instructorId, systemUserId));
+            registerEvent(new InstructorUpdatedEvent(instructorId, systemUserId));
         }
     }
 
-    public void activate() {
+    boolean isActive() {
+        return status.isActive();
+    }
+
+    void activate() {
         if (isActive()) {
-            throw new InstructorAlreadyActiveException();
+            throw new InstructorAlreadyActivatedException();
         }
         this.status = InstructorStatus.ACTIVE;
-        registerEvent(new InstructorActivated(instructorId, systemUserId));
+        registerEvent(new InstructorActivatedEvent(instructorId, systemUserId));
     }
 
-    public void deactivate() {
+    void deactivate() {
         if (!isActive()) {
-            throw new InstructorAlreadyInactiveException();
+            throw new InstructorAlreadyDeactivatedException();
         }
         this.status = InstructorStatus.INACTIVE;
-        registerEvent(new InstructorDeactivated(instructorId, systemUserId));
+        registerEvent(new InstructorDeactivatedEvent(instructorId, systemUserId));
     }
 
     @Override
     public List<InstructorEvent> pullEvents() {
-        List<InstructorEvent> copyEvents = List.copyOf(instructorEvents);
-        instructorEvents.clear();
+        List<InstructorEvent> copyEvents = List.copyOf(events);
+        events.clear();
         return copyEvents;
     }
 
     @Override
     public void registerEvent(InstructorEvent instructorEvent) {
-        instructorEvents.add(Objects.requireNonNull(instructorEvent));
+        events.add(Objects.requireNonNull(instructorEvent));
     }
 
-    public boolean isSameProfile(InstructorProfile profile) {
-        return this.profile.equals(profile);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Instructor other)) {
+            return false;
+        }
+        return Objects.equals(instructorId, other.instructorId);
     }
 
-    public boolean isActive() {
-        return this.status.isActive();
+    @Override
+    public int hashCode() {
+        return Objects.hash(instructorId);
     }
 }
