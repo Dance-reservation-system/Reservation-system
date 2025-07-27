@@ -16,7 +16,7 @@ record InstructorProfile(InstructorName name,
             throw new InvalidInstructorProfileException("Specialties cannot be null or empty");
         }
         if (specialties.stream().anyMatch(Objects::isNull)) {
-            throw new InvalidInstructorProfileException("Specialities cannot contain null elements");
+            throw new InvalidInstructorProfileException("Specialties cannot contain null elements");
         }
         if (bio == null) {
             throw new InvalidInstructorProfileException("Bio cannot be null");
