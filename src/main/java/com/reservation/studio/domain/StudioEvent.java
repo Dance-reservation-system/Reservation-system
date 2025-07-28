@@ -1,4 +1,4 @@
 package com.reservation.studio.domain;
 
-public sealed interface StudioEvent permits BusinessHoursChanged, CancellationPolicyUpdated, ContactDetailsUpdated, StudioActivated, StudioClosed, StudioCreated, StudioRenamed {
+public sealed interface StudioEvent permits BusinessHoursChangedEvent, ReservationCancellationPolicyUpdatedEvent, ContactDetailsUpdatedEvent, StudioActivatedEvent, StudioClosedEvent, StudioCreatedEvent, StudioRenamedEvent {
 }

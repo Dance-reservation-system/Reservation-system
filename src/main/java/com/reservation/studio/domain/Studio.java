@@ -15,25 +15,25 @@ public class Studio implements AggregateRoot<StudioEvent> {
     private final OwnerId ownerId;
     private StudioName studioName;
     private BusinessHours businessHours;
-    private CancellationPolicy cancellationPolicy;
+    private ReservationCancellationPolicy reservationCancellationPolicy;
     private StudioStatus studioStatus;
     private ContactDetails contactDetails;
 
     private final List<StudioEvent> studioEvents = new ArrayList<>();
 
-    private Studio(StudioId studioId, OwnerId ownerId, StudioName studioName, BusinessHours businessHours, CancellationPolicy cancellationPolicy, ContactDetails contactDetails) {
+    private Studio(StudioId studioId, OwnerId ownerId, StudioName studioName, BusinessHours businessHours, ReservationCancellationPolicy reservationCancellationPolicy, ContactDetails contactDetails) {
         this.studioId = Objects.requireNonNull(studioId);
         this.ownerId = Objects.requireNonNull(ownerId);
         this.studioName = Objects.requireNonNull(studioName);
         this.businessHours = Objects.requireNonNull(businessHours);
-        this.cancellationPolicy = Objects.requireNonNull(cancellationPolicy);
+        this.reservationCancellationPolicy = Objects.requireNonNull(reservationCancellationPolicy);
         this.contactDetails = Objects.requireNonNull(contactDetails);
         this.studioStatus = StudioStatus.INACTIVE;
     }
 
-    static Studio create(StudioId studioId, OwnerId ownerId, StudioName studioName, BusinessHours businessHours, CancellationPolicy cancellationPolicy, ContactDetails contactDetails) {
-        Studio studio = new Studio(studioId, ownerId, studioName, businessHours, cancellationPolicy, contactDetails);
-        studio.registerEvent(new StudioCreated(studioId, ownerId));
+    static Studio create(StudioId studioId, OwnerId ownerId, StudioName studioName, BusinessHours businessHours, ReservationCancellationPolicy reservationCancellationPolicy, ContactDetails contactDetails) {
+        Studio studio = new Studio(studioId, ownerId, studioName, businessHours, reservationCancellationPolicy, contactDetails);
+        studio.registerEvent(new StudioCreatedEvent(studioId, ownerId));
         return studio;
     }
 
@@ -47,22 +47,22 @@ public class Studio implements AggregateRoot<StudioEvent> {
 
     void rename(StudioName newStudioName) {
         this.studioName = Objects.requireNonNull(newStudioName);
-        registerEvent(new StudioRenamed(studioId));
+        registerEvent(new StudioRenamedEvent(studioId));
     }
 
     void updateBusinessHours(BusinessHours newBusinessHours) {
         this.businessHours = Objects.requireNonNull(newBusinessHours);
-        registerEvent(new BusinessHoursChanged(studioId, businessHours));
+        registerEvent(new BusinessHoursChangedEvent(studioId, businessHours));
     }
 
-    void updateCancellationPolicy(CancellationPolicy newCancellationPolicy) {
-        this.cancellationPolicy = Objects.requireNonNull(newCancellationPolicy);
-        registerEvent(new CancellationPolicyUpdated(studioId, cancellationPolicy));
+    void updateCancellationPolicy(ReservationCancellationPolicy newReservationCancellationPolicy) {
+        this.reservationCancellationPolicy = Objects.requireNonNull(newReservationCancellationPolicy);
+        registerEvent(new ReservationCancellationPolicyUpdatedEvent(studioId, reservationCancellationPolicy));
     }
 
     void updateContactDetails(ContactDetails newContactDetails) {
         this.contactDetails = Objects.requireNonNull(newContactDetails);
-        registerEvent(new ContactDetailsUpdated(studioId, contactDetails));
+        registerEvent(new ContactDetailsUpdatedEvent(studioId, contactDetails));
     }
 
     void activate() {
@@ -70,7 +70,7 @@ public class Studio implements AggregateRoot<StudioEvent> {
             throw new StudioAlreadyActiveException();
         }
         this.studioStatus = StudioStatus.ACTIVE;
-        registerEvent(new StudioActivated(studioId));
+        registerEvent(new StudioActivatedEvent(studioId));
     }
 
     void close() {
@@ -78,7 +78,7 @@ public class Studio implements AggregateRoot<StudioEvent> {
             throw new StudioAlreadyClosedException();
         }
         this.studioStatus = StudioStatus.CLOSED;
-        registerEvent(new StudioClosed(studioId));
+        registerEvent(new StudioClosedEvent(studioId));
     }
 
     boolean canAcceptReservationAt(DayOfWeek day, LocalTime time) {
@@ -103,5 +103,17 @@ public class Studio implements AggregateRoot<StudioEvent> {
     @Override
     public void registerEvent(StudioEvent event) {
         studioEvents.add(Objects.requireNonNull(event));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Studio studio = (Studio) o;
+        return Objects.equals(studioId, studio.studioId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(studioId);
     }
 }

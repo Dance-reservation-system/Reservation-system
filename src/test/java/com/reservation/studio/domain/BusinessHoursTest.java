@@ -21,7 +21,7 @@ class BusinessHoursTest {
                 .build();
 
         for (DayOfWeek day : DayOfWeek.values()) {
-            assertThat(businessHours.scheduleFor(day)).isInstanceOf(OpeningSchedule.class);
+            assertThat(businessHours.scheduleFor(day)).isNotNull().isInstanceOf(OpeningSchedule.class);
         }
     }
 

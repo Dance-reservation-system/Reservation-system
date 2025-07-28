@@ -11,7 +11,6 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalTime;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,7 +23,7 @@ class StudioTest {
 
         assertAll(
                 () -> assertFalse(studio.isActive()),
-                () -> assertThat(studio.pullEvents()).anyMatch(e -> e instanceof StudioCreated)
+                () -> assertTrue(studio.pullEvents().stream().anyMatch(StudioCreatedEvent.class::isInstance))
         );
     }
 
@@ -37,7 +36,7 @@ class StudioTest {
 
         assertAll(
                 () -> assertTrue(studio.hasName(newName)),
-                () -> assertThat(studio.pullEvents()).anyMatch(e -> e instanceof StudioRenamed)
+                () -> assertTrue(studio.pullEvents().stream().anyMatch(StudioRenamedEvent.class::isInstance))
         );
     }
 
@@ -51,19 +50,19 @@ class StudioTest {
         studio.updateBusinessHours(newHours);
 
         assertAll(
-                () -> assertThat(studio.pullEvents()).anyMatch(e -> e instanceof BusinessHoursChanged)
+                () -> assertTrue(studio.pullEvents().stream().anyMatch(BusinessHoursChangedEvent.class::isInstance))
         );
     }
 
     @Test
     void shouldUpdateCancellationPolicyAndEmitUpdatedEvent() {
         Studio studio = new StudioTestBuilder().build();
-        CancellationPolicy newPolicy = new CancellationPolicy(Duration.ofHours(3));
+        ReservationCancellationPolicy newPolicy = new ReservationCancellationPolicy(Duration.ofHours(3));
 
         studio.updateCancellationPolicy(newPolicy);
 
         assertAll(
-                () -> assertThat(studio.pullEvents()).anyMatch(e -> e instanceof CancellationPolicyUpdated)
+                () -> assertTrue(studio.pullEvents().stream().anyMatch(ReservationCancellationPolicyUpdatedEvent.class::isInstance))
         );
     }
 
@@ -75,7 +74,7 @@ class StudioTest {
         studio.updateContactDetails(newContactDetails);
 
         assertAll(
-                () -> assertThat(studio.pullEvents()).anyMatch(e -> e instanceof ContactDetailsUpdated)
+                () -> assertTrue(studio.pullEvents().stream().anyMatch(ContactDetailsUpdatedEvent.class::isInstance))
         );
     }
 
@@ -87,7 +86,7 @@ class StudioTest {
 
         assertAll(
                 () -> assertTrue(studio.isActive()),
-                () -> assertThat(studio.pullEvents()).anyMatch(e -> e instanceof StudioActivated)
+                () -> assertTrue(studio.pullEvents().stream().anyMatch(StudioActivatedEvent.class::isInstance))
         );
     }
 
@@ -109,7 +108,7 @@ class StudioTest {
 
         assertAll(
                 () -> assertFalse(studio.isActive()),
-                () -> assertThat(studio.pullEvents()).anyMatch(e -> e instanceof StudioClosed)
+                () -> assertTrue(studio.pullEvents().stream().anyMatch(StudioClosedEvent.class::isInstance))
         );
     }
 
@@ -182,7 +181,7 @@ class StudioTest {
 
     @Test
     void shouldThrowOnNegativeCancellationPolicy() {
-        assertThrows(InvalidCancellationThresholdException.class, () -> new CancellationPolicy(Duration.ofHours(-1)));
+        assertThrows(InvalidCancellationThresholdException.class, () -> new ReservationCancellationPolicy(Duration.ofHours(-1)));
     }
 
     @Test

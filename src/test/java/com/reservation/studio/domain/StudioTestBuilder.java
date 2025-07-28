@@ -8,7 +8,7 @@ class StudioTestBuilder {
     private final OwnerId ownerId = OwnerId.next();
     private StudioName studioName = new StudioName("StudioName");
     private BusinessHours businessHours = new BusinessHoursTestBuilder().openAllDays(LocalTime.of(8, 0), LocalTime.of(16, 0)).build();
-    private CancellationPolicy cancellationPolicy = new CancellationPolicy(Duration.ofHours(1));
+    private ReservationCancellationPolicy reservationCancellationPolicy = new ReservationCancellationPolicy(Duration.ofHours(1));
     private ContactDetails contactDetails = new ContactDetails("Address", "123456789");
 
     public StudioTestBuilder withStudioName(StudioName studioName) {
@@ -21,8 +21,8 @@ class StudioTestBuilder {
         return this;
     }
 
-    public StudioTestBuilder withCancellationPolicy(CancellationPolicy cancellationPolicy) {
-        this.cancellationPolicy = cancellationPolicy;
+    public StudioTestBuilder withCancellationPolicy(ReservationCancellationPolicy reservationCancellationPolicy) {
+        this.reservationCancellationPolicy = reservationCancellationPolicy;
         return this;
     }
 
@@ -32,6 +32,6 @@ class StudioTestBuilder {
     }
 
     public Studio build() {
-        return Studio.create(studioId, ownerId, studioName, businessHours, cancellationPolicy, contactDetails);
+        return Studio.create(studioId, ownerId, studioName, businessHours, reservationCancellationPolicy, contactDetails);
     }
 }

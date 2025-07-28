@@ -5,8 +5,8 @@ import com.reservation.studio.domain.exception.InvalidCancellationThresholdExcep
 import java.time.Duration;
 import java.util.Objects;
 
-record CancellationPolicy(Duration duration) {
-    CancellationPolicy {
+record ReservationCancellationPolicy(Duration duration) {
+    ReservationCancellationPolicy {
         Objects.requireNonNull(duration);
         if (!duration.isPositive()) {
             throw new InvalidCancellationThresholdException(duration);
