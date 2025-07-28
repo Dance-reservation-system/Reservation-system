@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class InstructorProfileTest {
 
@@ -21,30 +21,27 @@ class InstructorProfileTest {
     void shouldCreateValidInstructorProfile() {
         InstructorProfile profile = new InstructorProfile(NAME, SPECIALTIES, BIO);
 
-        assertEquals(NAME, profile.name());
-        assertEquals(SPECIALTIES, profile.specialties());
-        assertEquals(BIO, profile.bio());
+        assertThat(profile.name()).isEqualTo(NAME);
+        assertThat(profile.specialties()).isEqualTo(SPECIALTIES);
+        assertThat(profile.bio()).isEqualTo(BIO);
     }
 
     @Test
     void shouldThrowExceptionWhenNameIsNull() {
-        assertThrows(InvalidInstructorProfileException.class, () ->
-                new InstructorProfile(null, SPECIALTIES, BIO)
-        );
+        assertThatThrownBy(() -> new InstructorProfile(null, SPECIALTIES, BIO))
+                .isInstanceOf(InvalidInstructorProfileException.class);
     }
 
     @Test
     void shouldThrowExceptionWhenSpecialtiesIsNull() {
-        assertThrows(InvalidInstructorProfileException.class, () ->
-                new InstructorProfile(NAME, null, BIO)
-        );
+        assertThatThrownBy(() -> new InstructorProfile(NAME, null, BIO))
+                .isInstanceOf(InvalidInstructorProfileException.class);
     }
 
     @Test
     void shouldThrowExceptionWhenSpecialtiesIsEmpty() {
-        assertThrows(InvalidInstructorProfileException.class, () ->
-                new InstructorProfile(NAME, Set.of(), BIO)
-        );
+        assertThatThrownBy(() -> new InstructorProfile(NAME, Set.of(), BIO))
+                .isInstanceOf(InvalidInstructorProfileException.class);
     }
 
     @Test
@@ -53,38 +50,31 @@ class InstructorProfileTest {
         invalidSpecialties.add(SPECIALTY);
         invalidSpecialties.add(null);
 
-        assertThrows(InvalidInstructorProfileException.class, () ->
-                new InstructorProfile(NAME,
-                        invalidSpecialties,
-                        BIO
-                )
-        );
+        assertThatThrownBy(() -> new InstructorProfile(NAME,
+                invalidSpecialties,
+                BIO
+        )).isInstanceOf(InvalidInstructorProfileException.class);
     }
 
     @Test
     void shouldThrowExceptionWhenAnyOfTheSpecialtiesIsNull() {
-        assertThrows(InvalidInstructorSpecialtyException.class, () ->
-                new InstructorProfile(NAME,
-                        Set.of(SPECIALTY, new InstructorSpecialty(null)),
-                        BIO
-                )
-        );
+        assertThatThrownBy(() -> new InstructorProfile(NAME,
+                Set.of(SPECIALTY, new InstructorSpecialty(null)),
+                BIO
+        )).isInstanceOf(InvalidInstructorSpecialtyException.class);
     }
 
     @Test
     void shouldThrowExceptionWhenAnyOfTheSpecialtiesIsBlank() {
-        assertThrows(InvalidInstructorSpecialtyException.class, () ->
-                new InstructorProfile(NAME,
-                        Set.of(SPECIALTY, new InstructorSpecialty("  ")),
-                        BIO
-                )
-        );
+        assertThatThrownBy(() -> new InstructorProfile(NAME,
+                Set.of(SPECIALTY, new InstructorSpecialty("  ")),
+                BIO
+        )).isInstanceOf(InvalidInstructorSpecialtyException.class);
     }
 
     @Test
     void shouldThrowExceptionWhenBioIsNull() {
-        assertThrows(InvalidInstructorProfileException.class, () ->
-                new InstructorProfile(NAME, SPECIALTIES, null)
-        );
+        assertThatThrownBy(() -> new InstructorProfile(NAME, SPECIALTIES, null))
+                .isInstanceOf(InvalidInstructorProfileException.class);
     }
 }

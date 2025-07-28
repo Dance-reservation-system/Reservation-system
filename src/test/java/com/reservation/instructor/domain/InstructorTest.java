@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class InstructorTest {
 
@@ -38,19 +39,17 @@ class InstructorTest {
     void shouldCreateInstructorWithActiveStatus() {
         events = instructor.pullEvents();
 
-        assertEquals(instructorId, instructor.getInstructorId());
-        assertEquals(systemUserId, instructor.getSystemUserId());
-        assertTrue(instructor.isSameProfile(instructorProfile));
-        assertTrue(instructor.isActive());
+        assertThat(instructor.getInstructorId()).isEqualTo(instructorId);
+        assertThat(instructor.getSystemUserId()).isEqualTo(systemUserId);
+        assertThat(instructor.isSameProfile(instructorProfile)).isTrue();
+        assertThat(instructor.isActive()).isTrue();
 
         InstructorCreatedEvent event = findFirstEventWithClass(InstructorCreatedEvent.class)
                 .orElseThrow(() -> new AssertionError("Expected InstructorCreatedEvent"));
 
-        assertAll(
-                () -> assertEquals(instructorId, event.instructorId()),
-                () -> assertEquals(systemUserId, event.systemUserId()),
-                () -> assertNotNull(event.createdAt())
-        );
+        assertThat(event.instructorId()).isEqualTo(instructorId);
+        assertThat(event.systemUserId()).isEqualTo(systemUserId);
+        assertThat(event.createdAt()).isNotNull();
     }
 
     @Test
@@ -65,11 +64,9 @@ class InstructorTest {
         InstructorUpdatedEvent event = findFirstEventWithClass(InstructorUpdatedEvent.class)
                 .orElseThrow(() -> new AssertionError("Expected InstructorUpdatedEvent"));
 
-        assertAll(
-                () -> assertEquals(instructorId, event.instructorId()),
-                () -> assertEquals(systemUserId, event.systemUserId()),
-                () -> assertNotNull(event.updatedAt())
-        );
+        assertThat(event.instructorId()).isEqualTo(instructorId);
+        assertThat(event.systemUserId()).isEqualTo(systemUserId);
+        assertThat(event.updatedAt()).isNotNull();
     }
 
     @Test
@@ -77,7 +74,7 @@ class InstructorTest {
         instructor.updateProfile(instructorProfile);
         events = instructor.pullEvents();
 
-        assertEquals(1, events.size());
+        assertThat(events).hasSize(1);
     }
 
     @Test
@@ -88,9 +85,8 @@ class InstructorTest {
 
         instructor.deactivate();
 
-        assertThrows(InstructorProfileCannotBeUpdatedWhenInactiveException.class, () ->
-                instructor.updateProfile(newProfile)
-        );
+        assertThatThrownBy(() -> instructor.updateProfile(newProfile))
+                .isInstanceOf(InstructorProfileCannotBeUpdatedWhenInactiveException.class);
     }
 
     @Test
@@ -99,22 +95,20 @@ class InstructorTest {
         instructor.activate();
         events = instructor.pullEvents();
 
-        assertTrue(instructor.isActive());
+        assertThat(instructor.isActive()).isTrue();
 
         InstructorActivatedEvent event = findFirstEventWithClass(InstructorActivatedEvent.class)
                 .orElseThrow(() -> new AssertionError("Expected InstructorActivatedEvent"));
 
-        assertAll(
-                () -> assertEquals(instructorId, event.instructorId()),
-                () -> assertEquals(systemUserId, event.systemUserId()),
-                () -> assertNotNull(event.activatedAt())
-
-        );
+        assertThat(event.instructorId()).isEqualTo(instructorId);
+        assertThat(event.systemUserId()).isEqualTo(systemUserId);
+        assertThat(event.activatedAt()).isNotNull();
     }
 
     @Test
     void shouldThrowWhenActivatingAlreadyActiveInstructor() {
-        assertThrows(InstructorAlreadyActivatedException.class, instructor::activate);
+        assertThatThrownBy(instructor::activate)
+                .isInstanceOf(InstructorAlreadyActivatedException.class);
     }
 
     @Test
@@ -125,18 +119,17 @@ class InstructorTest {
         InstructorDeactivatedEvent event = findFirstEventWithClass(InstructorDeactivatedEvent.class)
                 .orElseThrow(() -> new AssertionError("Expected InstructorDeactivatedEvent"));
 
-        assertAll(
-                () -> assertEquals(instructorId, event.instructorId()),
-                () -> assertEquals(systemUserId, event.systemUserId()),
-                () -> assertNotNull(event.deactivatedAt())
-        );
+        assertThat(event.instructorId()).isEqualTo(instructorId);
+        assertThat(event.systemUserId()).isEqualTo(systemUserId);
+        assertThat(event.deactivatedAt()).isNotNull();
     }
 
     @Test
     void shouldThrowWhenDeactivatingAlreadyInactiveInstructor() {
         instructor.deactivate();
 
-        assertThrows(InstructorAlreadyDeactivatedException.class, instructor::deactivate);
+        assertThatThrownBy(instructor::deactivate)
+                .isInstanceOf(InstructorAlreadyDeactivatedException.class);
     }
 
     private <T> Optional<T> findFirstEventWithClass(Class<T> eventClass) {
