@@ -94,10 +94,10 @@ class Instructor implements AggregateRoot<InstructorEvent> {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Instructor other)) {
-            return false;
+        if (o instanceof Instructor other) {
+            return Objects.equals(instructorId, other.instructorId);
         }
-        return Objects.equals(instructorId, other.instructorId);
+        return false;
     }
 
     @Override
