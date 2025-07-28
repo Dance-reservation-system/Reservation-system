@@ -33,8 +33,7 @@ class InstructorTest {
 
         List<InstructorEvent> events = instructor.pullEvents();
 
-        InstructorCreatedEvent event = findFirstEventWithClass(events, InstructorCreatedEvent.class)
-                .orElseThrow(() -> new AssertionError("Expected InstructorCreatedEvent"));
+        InstructorCreatedEvent event = findFirstEventWithClassOrThrow(events, InstructorCreatedEvent.class);
 
         assertThat(event.instructorId()).isEqualTo(instructorId);
         assertThat(event.systemUserId()).isEqualTo(systemUserId);
@@ -54,8 +53,7 @@ class InstructorTest {
         instructor.updateProfile(newProfile);
         List<InstructorEvent> events = instructor.pullEvents();
 
-        InstructorUpdatedEvent event = findFirstEventWithClass(events, InstructorUpdatedEvent.class)
-                .orElseThrow(() -> new AssertionError("Expected InstructorUpdatedEvent"));
+        InstructorUpdatedEvent event = findFirstEventWithClassOrThrow(events, InstructorUpdatedEvent.class);
 
         assertThat(event.instructorId()).isEqualTo(instructor.getInstructorId());
         assertThat(event.systemUserId()).isEqualTo(instructor.getSystemUserId());
@@ -101,8 +99,7 @@ class InstructorTest {
 
         assertThat(instructor.isActive()).isTrue();
 
-        InstructorActivatedEvent event = findFirstEventWithClass(events, InstructorActivatedEvent.class)
-                .orElseThrow(() -> new AssertionError("Expected InstructorActivatedEvent"));
+        InstructorActivatedEvent event = findFirstEventWithClassOrThrow(events, InstructorActivatedEvent.class);
 
         assertThat(event.instructorId()).isEqualTo(instructor.getInstructorId());
         assertThat(event.systemUserId()).isEqualTo(instructor.getSystemUserId());
@@ -124,8 +121,7 @@ class InstructorTest {
         instructor.deactivate();
         List<InstructorEvent> events = instructor.pullEvents();
 
-        InstructorDeactivatedEvent event = findFirstEventWithClass(events, InstructorDeactivatedEvent.class)
-                .orElseThrow(() -> new AssertionError("Expected InstructorDeactivatedEvent"));
+        InstructorDeactivatedEvent event = findFirstEventWithClassOrThrow(events, InstructorDeactivatedEvent.class);
 
         assertThat(event.instructorId()).isEqualTo(instructor.getInstructorId());
         assertThat(event.systemUserId()).isEqualTo(instructor.getSystemUserId());
@@ -147,5 +143,11 @@ class InstructorTest {
                 .filter(eventClass::isInstance)
                 .map(eventClass::cast)
                 .findFirst();
+    }
+
+    private <T> T findFirstEventWithClassOrThrow(List<InstructorEvent> events,
+                                                 Class<T> eventClass) {
+        return findFirstEventWithClass(events, eventClass)
+                .orElseThrow(() -> new AssertionError("Expected %s".formatted(eventClass.getSimpleName())));
     }
 }
