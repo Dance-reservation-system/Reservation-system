@@ -10,7 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    @Profile({"keycloak-test", "local"})
+    @Profile({"keycloak-test", "local", "dev"})
     @Bean
     public SecurityFilterChain keycloakTestSecurityFilterChain(HttpSecurity http) throws Exception {
         http

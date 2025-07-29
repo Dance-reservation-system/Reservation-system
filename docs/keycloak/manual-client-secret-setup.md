@@ -1,6 +1,8 @@
 ### 📘 This guide is also available in the [🇵🇱 Polish version](manual-client-secret-setup-pl.md)
 
-# Manual Configuration of `client_secret` in Keycloak (since version 25)
+## To run the application that communicates with a remote Keycloak instance, you need to obtain the current access credentials from the project owner and update the .env file located in the root directory of the project accordingly. Then, simply run the application in the dev environment.
+
+# Manual Configuration of `client_secret` in Keycloak (since version 25) for local run purposes.
 
 Starting with **Keycloak version 25**, the ability to automatically import the `client_secret` value during realm import has been **intentionally disabled**. This change affects confidential clients (OIDC), for which the secret must now be **manually set in the admin console** after import.
 
@@ -10,7 +12,7 @@ This guide provides step-by-step instructions on how to manually generate and co
 
 When starting the Keycloak instance for the first time using the current project configuration (as of **June 18, 2025**), the system initializes with a predefined realm configuration. This includes default clients, roles, and users; however — due to limitations introduced in Keycloak 25+ — **the `client_secret` value for confidential clients is not included**.
 
-To start the Keycloak instance, run the `docker-compose-keycloak` script located in the `.docker/` directory.
+To start the Keycloak instance, run the `docker-compose-keycloak-local` script located in the `.docker/keycloak/` directory.
 
 If you use IntelliJ IDEA, you can conveniently do this by clicking a single button from the “Services” panel or from the editor, as shown in the screenshot below:
 
